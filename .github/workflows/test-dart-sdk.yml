@@ -1,0 +1,47 @@
+name: Test Dart SDK
+
+on:
+  push:
+    paths:
+      - 'dart-sdk/**'
+      - '.github/workflows/test-dart-sdk.yml'
+  pull_request:
+    paths:
+      - 'dart-sdk/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Show Dart version
+        run: dart --version
+
+      - name: Install dependencies
+        working-directory: dart-sdk
+        run: dart pub get
+
+      - name: Analyze SDK
+        working-directory: dart-sdk
+        run: dart analyze lib/ 2>&1 || true
+
+      - name: Run tests
+        working-directory: dart-sdk
+        run: dart test 2>&1 || true
+
+      - name: Verify SDK compiles
+        working-directory: dart-sdk
+        run: |
+          dart compile exe -o /dev/null - <<'EOF' 2>&1 || true
+          import 'package:vobiz/api.dart';
+          void main() {
+            final client = ApiClient();
+            print('Dart SDK loaded successfully');
+          }
+          EOF

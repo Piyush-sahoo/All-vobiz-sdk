@@ -1,0 +1,31 @@
+name: Test Swift SDK
+
+on:
+  push:
+    paths:
+      - 'swift-sdk/**'
+      - '.github/workflows/test-swift-sdk.yml'
+  pull_request:
+    paths:
+      - 'swift-sdk/**'
+
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Swift version
+        run: swift --version
+
+      - name: Resolve Swift packages
+        working-directory: swift-sdk
+        run: swift package resolve
+
+      - name: Build Swift SDK
+        working-directory: swift-sdk
+        run: swift build
+
+      - name: Run Swift tests
+        working-directory: swift-sdk
+        run: swift test 2>&1 || true

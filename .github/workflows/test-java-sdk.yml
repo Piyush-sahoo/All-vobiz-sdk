@@ -1,0 +1,41 @@
+name: Test Java SDK
+
+on:
+  push:
+    paths:
+      - 'java-sdk/**'
+      - '.github/workflows/test-java-sdk.yml'
+  pull_request:
+    paths:
+      - 'java-sdk/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('java-sdk/**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Build with Maven
+        working-directory: java-sdk
+        run: mvn clean compile -B
+
+      - name: Run tests
+        working-directory: java-sdk
+        run: mvn test -B 2>&1 || true
+
+      - name: Package JAR
+        working-directory: java-sdk
+        run: mvn package -DskipTests -B

@@ -1,0 +1,3862 @@
+openapi: 3.0.0
+info:
+  description: |-
+    Complete Vobiz API collection covering all endpoints: Calls, Conferences, Recordings, Account, Phone Numbers, Applications, Endpoints, Trunks, Sub-Accounts, and CDR.
+
+    Base URL: https://api.vobiz.ai
+
+    Authentication: All requests require X-Auth-ID and X-Auth-Token headers.
+  title: Vobiz API
+  version: 1.0.0
+servers:
+- url: https://api.vobiz.ai
+security:
+- ApiKeyAuthID: []
+  ApiKeyAuthToken: []
+tags:
+- description: "Outbound calls, call control, DTMF, audio playback, text-to-speech,\
+    \ and recording."
+  name: Call
+- description: "Conference management, member control, audio playback, and recording."
+  name: Conference
+- description: "Manage call recordings: list, retrieve, delete, bulk delete, and export."
+  name: Recording
+- description: "Account details, balance, transactions, and concurrency."
+  name: Account
+- description: "Manage account phone numbers, inventory browsing, purchasing, and\
+    \ releasing."
+  name: Phone Numbers
+- description: Create and manage applications with call handling URLs and number linking.
+  name: Application
+- description: Manage SIP endpoints for voice communication.
+  name: Endpoint
+- description: "SIP trunk management including credentials, IP ACLs, origination URIs,\
+    \ and number assignment."
+  name: Trunk
+- description: Create and manage sub-accounts under the master account.
+  name: Sub-Account
+- description: Call Detail Records for reporting and analytics.
+  name: CDR
+paths:
+  /api/v1/Account/{auth_id}/Call/:
+    get:
+      description: Get a list of all call UUIDs for calls currently queued and waiting
+        to connect. Max 20 results.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Must be 'queued'
+        example: queued
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Retrieve All Queued Calls
+      tags:
+      - Call
+    post:
+      description: Initiate an outbound call to a PSTN number or SIP endpoint. Supports
+        bulk calls (up to 1000 destinations using < separator).
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                from: +1XXXXXXXXXX
+                to: +1YYYYYYYYYY
+                answer_url: https://example.com/answer
+                answer_method: POST
+                ring_url: https://example.com/ring
+                ring_method: POST
+                hangup_url: https://example.com/hangup
+                hangup_method: POST
+                fallback_url: https://example.com/fallback
+                fallback_method: POST
+                machine_detection: "true"
+                machine_detection_time: 5000
+                caller_name: Vobiz Caller
+                time_limit: 14400
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Make an Outbound Call
+      tags:
+      - Call
+  /api/v1/Account/{auth_id}/Call/{}/:
+    delete:
+      description: Terminate an active call. Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Hang Up a Call
+      tags:
+      - Call
+    get:
+      description: Get details of a specific queued call.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Must be 'queued'
+        example: queued
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Retrieve a Queued Call
+      tags:
+      - Call
+    post:
+      description: Transfer an in-progress call to a different URL for new call flow
+        instructions.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                legs: aleg
+                aleg_url: https://example.com/new-flow
+                aleg_method: POST
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Transfer a Call
+      tags:
+      - Call
+  /api/v1/Account/{auth_id}/Call/{}/DTMF/:
+    post:
+      description: Send DTMF digits to an active call for automated IVR navigation.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                digits: 1234#
+                leg: aleg
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Send DTMF Digits
+      tags:
+      - Call
+  /api/v1/Account/{auth_id}/Call/{}/Play/:
+    delete:
+      description: Stop audio playback on an active call. Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Stop Playing Audio on a Call
+      tags:
+      - Call
+    post:
+      description: Play audio file(s) during an active call.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                urls:
+                - https://example.com/audio.mp3
+                length: 120
+                legs: aleg
+                loop: false
+                mix: true
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Play Audio on a Call
+      tags:
+      - Call
+  /api/v1/Account/{auth_id}/Call/{}/Speak/:
+    delete:
+      description: Stop text-to-speech playback. Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Stop Speaking Text on a Call
+      tags:
+      - Call
+    post:
+      description: Convert text to speech and play it during an active call. Supports
+        29 languages.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                text: "Hello, this is a test message."
+                voice: WOMAN
+                language: en-US
+                legs: aleg
+                loop: false
+                mix: true
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Speak Text on a Call (TTS)
+      tags:
+      - Call
+  /api/v1/Account/{auth_id}/Call/{}/Record/:
+    delete:
+      description: Stop active recording(s) on a call. Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Stop Recording a Call
+      tags:
+      - Call
+    post:
+      description: Begin recording an active call.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                time_limit: 60
+                file_format: mp3
+                callback_url: https://example.com/recording-callback
+                callback_method: POST
+                record_channel_type: mono
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Start Recording a Call
+      tags:
+      - Call
+  /api/v1/Account/{auth_id}/Conference/:
+    delete:
+      description: Terminate all ongoing conferences simultaneously. Returns 204 No
+        Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Hang Up All Conferences
+      tags:
+      - Conference
+    get:
+      description: Retrieve a list of all ongoing conferences.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: List All Conferences
+      tags:
+      - Conference
+  /api/v1/Account/{auth_id}/Conference/{}/:
+    delete:
+      description: Terminate a specific conference and disconnect all participants.
+        Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Hang Up a Conference
+      tags:
+      - Conference
+    get:
+      description: Get detailed information about a specific ongoing conference including
+        all active members.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Retrieve a Conference
+      tags:
+      - Conference
+  /api/v1/Account/{auth_id}/Conference/{}/Member/{}/:
+    delete:
+      description: Disconnect a member by terminating their call. Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Hang Up a Conference Member
+      tags:
+      - Conference
+  /api/v1/Account/{auth_id}/Conference/{}/Member/{}/Kick/:
+    post:
+      description: Disconnect a member while allowing XML flow continuation.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody: {}
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Kick a Conference Member
+      tags:
+      - Conference
+  /api/v1/Account/{auth_id}/Conference/{}/Member/{}/Mute/:
+    delete:
+      description: Restore audio from previously muted members.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Unmute a Conference Member
+      tags:
+      - Conference
+    post:
+      description: Mute member(s) so others cannot hear them.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody: {}
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Mute a Conference Member
+      tags:
+      - Conference
+  /api/v1/Account/{auth_id}/Conference/{}/Member/{}/Deaf/:
+    delete:
+      description: Restore audio reception for previously deafened members.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Undeaf a Conference Member
+      tags:
+      - Conference
+    post:
+      description: Prevent member(s) from hearing other participants.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody: {}
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Deaf a Conference Member
+      tags:
+      - Conference
+  /api/v1/Account/{auth_id}/Conference/{}/Member/{}/Play/:
+    delete:
+      description: Stop audio playback for specific member(s).
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Stop Playing Audio to a Conference Member
+      tags:
+      - Conference
+    post:
+      description: Play audio to specific member(s). Only targeted member(s) hear
+        the audio.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                url: https://example.com/audio.mp3
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Play Audio to a Conference Member
+      tags:
+      - Conference
+  /api/v1/Account/{auth_id}/Conference/{}/Record/:
+    delete:
+      description: Stop an active conference recording. Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Stop Conference Recording
+      tags:
+      - Conference
+    post:
+      description: Begin recording a conference call.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                file_format: mp3
+                recording_callback_url: https://example.com/recording-callback
+                recording_callback_method: POST
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Start Conference Recording
+      tags:
+      - Conference
+  /api/v1/Account/{account_id}/Recording/:
+    get:
+      description: Retrieve a paginated list of call recordings for your account.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: "Records per request (default: 20, max: 100)"
+        example: "20"
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: "Pagination offset (default: 0)"
+        example: "0"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Filter by specific call UUID
+        explode: true
+        in: query
+        name: call_uuid
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Filter by type: trunk or extension"
+        explode: true
+        in: query
+        name: recording_type
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: List All Recordings
+      tags:
+      - Recording
+  /api/v1/Account/{auth_id}/Recording/{}/:
+    delete:
+      description: Permanently delete a specific recording. Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Delete a Recording
+      tags:
+      - Recording
+    get:
+      description: Get detailed information about a specific recording.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Retrieve a Recording
+      tags:
+      - Recording
+  /api/v1/Account/{auth_id}/Recording/BulkDelete/:
+    delete:
+      description: Delete multiple recordings matching filter criteria (async operation).
+        Returns 202 Accepted.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Delete recordings on/after this date (YYYY-MM-DD HH:MM:SS)
+        explode: true
+        in: query
+        name: add_time__gte
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Delete recordings on/before this date
+        explode: true
+        in: query
+        name: add_time__lte
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Delete recordings for specific call UUID
+        explode: true
+        in: query
+        name: call_uuid
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Delete by caller number (partial match)
+        explode: true
+        in: query
+        name: from_number
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Delete by destination number (partial match)
+        explode: true
+        in: query
+        name: to_number
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: mp3 or wav
+        explode: true
+        in: query
+        name: recording_format
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Bulk Delete Recordings
+      tags:
+      - Recording
+  /api/v1/Account/{auth_id}/export/recording/:
+    post:
+      description: Export recordings as a downloadable archive sent via email (async).
+        Returns 202 Accepted.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                recipient:
+                  customer_account:
+                  - user@example.com
+                from: 2026-01-01 00:00:00
+                to: 2026-01-31 23:59:59
+                recording_format: mp3
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Export Historical Recordings
+      tags:
+      - Recording
+  /api/v1/auth/me:
+    get:
+      description: "Retrieve complete account details including pricing tier, credentials,\
+        \ and account settings."
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Retrieve Account Details
+      tags:
+      - Account
+  /api/v1/account/{account_id}/balance/INR:
+    get:
+      description: Retrieve the balance for a specific account and currency. Replace
+        'INR' with your currency code.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Get Balance
+      tags:
+      - Account
+  /api/v1/account/{account_id}/transactions:
+    get:
+      description: Retrieve a list of transactions for a specific account.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: "Records per page (default: 50)"
+        example: "50"
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: "Pagination offset (default: 0)"
+        example: "0"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Get Transactions
+      tags:
+      - Account
+  /api/v1/account/{auth_id}/concurrency:
+    get:
+      description: Retrieve current concurrent call count and capacity.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Get Concurrency
+      tags:
+      - Account
+  /api/v1/account/{auth_id}/numbers:
+    get:
+      description: Retrieve all phone numbers associated with your account.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: List Account Phone Numbers
+      tags:
+      - Phone Numbers
+  /api/v1/account/{auth_id}/inventory/numbers:
+    get:
+      description: Browse available phone numbers in inventory for purchase.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Filter by country code
+        example: US
+        explode: true
+        in: query
+        name: country
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Page number
+        example: "1"
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Results per page
+        example: "20"
+        explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: List Inventory Numbers
+      tags:
+      - Phone Numbers
+  /api/v1/account/{auth_id}/numbers/purchase-from-inventory:
+    post:
+      description: Purchase a phone number from available inventory.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                number: +1XXXXXXXXXX
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Purchase from Inventory
+      tags:
+      - Phone Numbers
+  /api/v1/account/{auth_id}/numbers/:e164_number:
+    delete:
+      description: Release (unrent) a phone number from your account.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Unrent a Phone Number
+      tags:
+      - Phone Numbers
+  /api/v1/Account/{auth_id}/Application/:
+    get:
+      description: Retrieve all applications with pagination.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Results per page
+        example: "20"
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Pagination offset
+        example: "0"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: List All Applications
+      tags:
+      - Application
+    post:
+      description: Create a new application with call handling URLs.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                app_name: My Application
+                answer_url: https://example.com/answer
+                answer_method: POST
+                hangup_url: https://example.com/hangup
+                hangup_method: POST
+                fallback_answer_url: https://example.com/fallback
+                fallback_method: POST
+                message_url: https://example.com/message
+                message_method: POST
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Create Application
+      tags:
+      - Application
+  /api/v1/Account/{auth_id}/Application/{}/:
+    delete:
+      description: Delete an application. Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Delete an Application
+      tags:
+      - Application
+    get:
+      description: Get details of a specific application by its ID.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Retrieve an Application
+      tags:
+      - Application
+    post:
+      description: Update an existing application's settings.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                app_name: Updated Application Name
+                answer_url: https://example.com/new-answer
+                answer_method: POST
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Update an Application
+      tags:
+      - Application
+  /api/v1/account/{auth_id}/numbers/{}/application:
+    delete:
+      description: Remove association between a phone number and application.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Unlink Number from Application
+      tags:
+      - Application
+    post:
+      description: Associate a phone number with an application.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                app_id: your_application_id
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Link Number to Application
+      tags:
+      - Application
+  /api/v1/Account/{auth_id}/Endpoint/:
+    get:
+      description: Retrieve all endpoints with pagination.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Results per page
+        example: "20"
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Pagination offset
+        example: "0"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: List All Endpoints
+      tags:
+      - Endpoint
+    post:
+      description: Create a new SIP endpoint.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                username: myendpoint
+                password: securepassword
+                alias: My SIP Endpoint
+                app_id: your_application_id
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Create Endpoint
+      tags:
+      - Endpoint
+  /api/v1/Account/{auth_id}/Endpoint/{}/:
+    delete:
+      description: Delete an endpoint. Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Delete an Endpoint
+      tags:
+      - Endpoint
+    get:
+      description: Get details of a specific endpoint.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Retrieve an Endpoint
+      tags:
+      - Endpoint
+    post:
+      description: Update an existing endpoint's configuration.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: auth_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                alias: Updated Endpoint Name
+                password: newsecurepassword
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Update an Endpoint
+      tags:
+      - Endpoint
+  /api/v1/account/{account_id}/trunks:
+    get:
+      description: Retrieve all trunks.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Results per page
+        example: "20"
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Pagination offset
+        example: "0"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: List All Trunks
+      tags:
+      - Trunk
+    post:
+      description: Create a new SIP trunk.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                name: My SIP Trunk
+                description: Production trunk
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Create Trunk
+      tags:
+      - Trunk
+  /api/v1/account/{account_id}/trunks/:trunk_id:
+    delete:
+      description: Delete a trunk. Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Delete a Trunk
+      tags:
+      - Trunk
+    get:
+      description: Get details of a specific trunk.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Retrieve a Trunk
+      tags:
+      - Trunk
+    put:
+      description: Update an existing trunk.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                name: Updated Trunk Name
+                description: Updated description
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Update a Trunk
+      tags:
+      - Trunk
+  /api/v1/account/{account_id}/numbers/{}/assign:
+    delete:
+      description: Remove a phone number from its trunk assignment. Returns 204 No
+        Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Unassign Number from Trunk
+      tags:
+      - Trunk
+    post:
+      description: Assign a phone number to a trunk group.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                trunk_group_id: your_trunk_group_id
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Assign Number to Trunk
+      tags:
+      - Trunk
+  /api/v1/account/{account_id}/credentials:
+    post:
+      description: Create SIP authentication credentials for a trunk.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                username: sip_user
+                password: securepassword
+                trunk_id: your_trunk_id
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Create Credential
+      tags:
+      - Trunk
+  /api/v1/account/{account_id}/trunks/credentials:
+    get:
+      description: Retrieve all SIP credentials.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Results per page
+        example: "20"
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Pagination offset
+        example: "0"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: List All Credentials
+      tags:
+      - Trunk
+  /api/v1/account/{account_id}/credentials/:credential_id:
+    delete:
+      description: Delete a SIP credential. Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Delete a Credential
+      tags:
+      - Trunk
+    put:
+      description: Update SIP credential settings.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                password: newpassword
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Update a Credential
+      tags:
+      - Trunk
+  /api/v1/account/{account_id}/ip-acl:
+    post:
+      description: Create an IP Access Control List entry for trunk authentication.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                ip_address: 203.0.113.0/24
+                description: Office IP range
+                trunk_id: your_trunk_id
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Create IP ACL
+      tags:
+      - Trunk
+  /api/v1/account/{account_id}/trunks/ip-acl:
+    get:
+      description: Retrieve all IP ACL entries.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Results per page
+        example: "20"
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Pagination offset
+        example: "0"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: List All IP ACLs
+      tags:
+      - Trunk
+  /api/v1/account/{account_id}/ip-acl/:ip_acl_id:
+    delete:
+      description: Delete an IP ACL entry. Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Delete an IP ACL
+      tags:
+      - Trunk
+    put:
+      description: Update an IP ACL entry.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                ip_address: 203.0.113.0/24
+                description: Updated office IP range
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Update an IP ACL
+      tags:
+      - Trunk
+  /api/v1/account/{account_id}/origination-uris:
+    post:
+      description: Create an origination URI for inbound SIP routing.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                sip_uri: sip:example.com:5060
+                priority: 1
+                weight: 100
+                trunk_id: your_trunk_id
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Create Origination URI
+      tags:
+      - Trunk
+  /api/v1/account/{account_id}/trunks/origination-uris:
+    get:
+      description: Retrieve all origination URIs.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Results per page
+        example: "20"
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Pagination offset
+        example: "0"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: List All Origination URIs
+      tags:
+      - Trunk
+  /api/v1/account/{account_id}/origination-uris/:uri_id:
+    delete:
+      description: Delete an origination URI. Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Delete an Origination URI
+      tags:
+      - Trunk
+    put:
+      description: Update an origination URI.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                sip_uri: sip:updated.example.com:5060
+                priority: 1
+                weight: 100
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Update an Origination URI
+      tags:
+      - Trunk
+  /api/v1/accounts/{account_id}/sub-accounts/:
+    get:
+      description: Retrieve all sub-accounts.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Page number
+        example: "1"
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Results per page
+        example: "20"
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Filter active sub-accounts only
+        example: "true"
+        explode: true
+        in: query
+        name: active_only
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: List All Sub-Accounts
+      tags:
+      - Sub-Account
+    post:
+      description: Create a new sub-account under the master account.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                name: My Sub-Account
+                description: Sub-account for department X
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Create Sub-Account
+      tags:
+      - Sub-Account
+  /api/v1/accounts/{account_id}/sub-accounts/:sub_account_id:
+    delete:
+      description: Delete a sub-account. Returns 204 No Content.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Delete a Sub-Account
+      tags:
+      - Sub-Account
+    get:
+      description: Get details of a specific sub-account.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Retrieve a Sub-Account
+      tags:
+      - Sub-Account
+    put:
+      description: Update sub-account settings.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                name: Updated Sub-Account Name
+                description: Updated description
+              type: object
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Update a Sub-Account
+      tags:
+      - Sub-Account
+  /api/v1/account/{account_id}/cdr:
+    get:
+      description: Retrieve call detail records with filtering and pagination.
+      parameters:
+      - example: "{{auth_id}}"
+        explode: false
+        in: header
+        name: X-Auth-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: "{{auth_token}}"
+        explode: false
+        in: header
+        name: X-Auth-Token
+        required: false
+        schema:
+          type: string
+        style: simple
+      - example: application/json
+        explode: false
+        in: header
+        name: Content-Type
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Start date (YYYY-MM-DD)
+        example: 2026-01-01
+        explode: true
+        in: query
+        name: start_date
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: End date (YYYY-MM-DD)
+        example: 2026-01-31
+        explode: true
+        in: query
+        name: end_date
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Results per page
+        example: "50"
+        explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Page number
+        example: "1"
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: false
+        in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Successful response
+      summary: Get Call Detail Records
+      tags:
+      - CDR
+components:
+  schemas: {}
+  securitySchemes:
+    ApiKeyAuthID:
+      in: header
+      name: X-Auth-ID
+      type: apiKey
+    ApiKeyAuthToken:
+      in: header
+      name: X-Auth-Token
+      type: apiKey
+

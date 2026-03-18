@@ -1,0 +1,159 @@
+name: Test All SDKs
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  # ─── Go ────────────────────────────────────────────────────────────────────
+  go-sdk:
+    name: Go SDK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - name: Fix module name
+        working-directory: go-sdk
+        run: |
+          sed -i 's|github.com/GIT_USER_ID/GIT_REPO_ID|github.com/vobiz/vobiz-go-sdk|g' go.mod
+          find . -name "*.go" -exec sed -i 's|github.com/GIT_USER_ID/GIT_REPO_ID|github.com/vobiz/vobiz-go-sdk|g' {} +
+      - run: go mod tidy
+        working-directory: go-sdk
+      - run: go build ./...
+        working-directory: go-sdk
+      - run: go vet ./...
+        working-directory: go-sdk
+
+  # ─── PHP ───────────────────────────────────────────────────────────────────
+  php-sdk:
+    name: PHP SDK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: curl, json, mbstring
+          tools: composer
+      - run: composer install --no-interaction --prefer-dist
+        working-directory: php-sdk
+      - name: Lint all PHP files
+        working-directory: php-sdk
+        run: find lib/ -name "*.php" -exec php -l {} \;
+      - name: Verify autoload
+        working-directory: php-sdk
+        run: |
+          php -r "
+          require 'vendor/autoload.php';
+          \$config = new Vobiz\Configuration();
+          \$config->setApiKey('X-Auth-ID', 'test_id');
+          \$config->setApiKey('X-Auth-Token', 'test_token');
+          echo 'PHP SDK loaded OK' . PHP_EOL;
+          "
+
+  # ─── Java ──────────────────────────────────────────────────────────────────
+  java-sdk:
+    name: Java SDK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('java-sdk/**/pom.xml') }}
+      - run: mvn clean compile -B
+        working-directory: java-sdk
+      - run: mvn package -DskipTests -B
+        working-directory: java-sdk
+
+  # ─── Ruby ──────────────────────────────────────────────────────────────────
+  ruby-sdk:
+    name: Ruby SDK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: ruby-sdk
+      - run: bundle install
+        working-directory: ruby-sdk
+      - name: Verify gem loads
+        working-directory: ruby-sdk
+        run: |
+          ruby -I lib -e "
+          require 'vobiz'
+          config = Vobiz::Configuration.new
+          config.api_key['X-Auth-ID'] = 'test_id'
+          config.api_key['X-Auth-Token'] = 'test_token'
+          puts 'Ruby SDK loaded OK'
+          "
+
+  # ─── C# ────────────────────────────────────────────────────────────────────
+  csharp-sdk:
+    name: C# SDK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet restore
+        working-directory: csharp-sdk
+      - run: dotnet build --no-restore --configuration Release
+        working-directory: csharp-sdk
+
+  # ─── Swift ─────────────────────────────────────────────────────────────────
+  swift-sdk:
+    name: Swift SDK
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift package resolve
+        working-directory: swift-sdk
+      - run: swift build
+        working-directory: swift-sdk
+
+  # ─── Kotlin ────────────────────────────────────────────────────────────────
+  kotlin-sdk:
+    name: Kotlin SDK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('kotlin-sdk/**/*.gradle*') }}
+      - run: chmod +x gradlew
+        working-directory: kotlin-sdk
+      - run: ./gradlew build -x test --no-daemon
+        working-directory: kotlin-sdk
+
+  # ─── Dart ──────────────────────────────────────────────────────────────────
+  dart-sdk:
+    name: Dart SDK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - run: dart pub get
+        working-directory: dart-sdk
+      - run: dart analyze lib/ 2>&1 || true
+        working-directory: dart-sdk

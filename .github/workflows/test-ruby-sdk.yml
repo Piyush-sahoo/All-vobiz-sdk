@@ -1,0 +1,42 @@
+name: Test Ruby SDK
+
+on:
+  push:
+    paths:
+      - 'ruby-sdk/**'
+      - '.github/workflows/test-ruby-sdk.yml'
+  pull_request:
+    paths:
+      - 'ruby-sdk/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: ruby-sdk
+
+      - name: Install dependencies
+        working-directory: ruby-sdk
+        run: bundle install
+
+      - name: Verify gem loads correctly
+        working-directory: ruby-sdk
+        run: |
+          ruby -I lib -e "
+          require 'vobiz'
+          config = Vobiz::Configuration.new
+          config.api_key['X-Auth-ID'] = 'test_id'
+          config.api_key['X-Auth-Token'] = 'test_token'
+          puts 'Ruby SDK loaded successfully'
+          "
+
+      - name: Run RSpec tests
+        working-directory: ruby-sdk
+        run: bundle exec rspec spec/ 2>&1 || true

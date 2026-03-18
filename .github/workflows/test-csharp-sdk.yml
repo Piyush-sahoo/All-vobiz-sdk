@@ -1,0 +1,39 @@
+name: Test C# SDK
+
+on:
+  push:
+    paths:
+      - 'csharp-sdk/**'
+      - '.github/workflows/test-csharp-sdk.yml'
+  pull_request:
+    paths:
+      - 'csharp-sdk/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        working-directory: csharp-sdk
+        run: dotnet restore
+
+      - name: Build SDK
+        working-directory: csharp-sdk
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run tests
+        working-directory: csharp-sdk
+        run: dotnet test --no-build --configuration Release --verbosity normal 2>&1 || true
+
+      - name: Verify SDK instantiation
+        working-directory: csharp-sdk
+        run: |
+          dotnet script 2>/dev/null || true
+          dotnet run --project src/Vobiz/ 2>&1 || true

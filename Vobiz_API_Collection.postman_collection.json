@@ -1,0 +1,1743 @@
+{
+  "info": {
+    "name": "Vobiz API",
+    "description": "Complete Vobiz API collection covering all endpoints: Calls, Conferences, Recordings, Account, Phone Numbers, Applications, Endpoints, Trunks, Sub-Accounts, and CDR.\n\nBase URL: https://api.vobiz.ai\n\nAuthentication: All requests require X-Auth-ID and X-Auth-Token headers.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.vobiz.ai",
+      "type": "string"
+    },
+    {
+      "key": "auth_id",
+      "value": "MA_XXXXXXXX",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "your_auth_token",
+      "type": "string"
+    },
+    {
+      "key": "account_id",
+      "value": "MA_XXXXXXXX",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Call",
+      "description": "Outbound calls, call control, DTMF, audio playback, text-to-speech, and recording.",
+      "item": [
+        {
+          "name": "Make an Outbound Call",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Call/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Call", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"from\": \"+1XXXXXXXXXX\",\n  \"to\": \"+1YYYYYYYYYY\",\n  \"answer_url\": \"https://example.com/answer\",\n  \"answer_method\": \"POST\",\n  \"ring_url\": \"https://example.com/ring\",\n  \"ring_method\": \"POST\",\n  \"hangup_url\": \"https://example.com/hangup\",\n  \"hangup_method\": \"POST\",\n  \"fallback_url\": \"https://example.com/fallback\",\n  \"fallback_method\": \"POST\",\n  \"machine_detection\": \"true\",\n  \"machine_detection_time\": 5000,\n  \"caller_name\": \"Vobiz Caller\",\n  \"time_limit\": 14400\n}"
+            },
+            "description": "Initiate an outbound call to a PSTN number or SIP endpoint. Supports bulk calls (up to 1000 destinations using < separator)."
+          }
+        },
+        {
+          "name": "Transfer a Call",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Call/:call_uuid/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Call", ":call_uuid", ""],
+              "variable": [
+                { "key": "call_uuid", "value": "", "description": "UUID of the active call" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"legs\": \"aleg\",\n  \"aleg_url\": \"https://example.com/new-flow\",\n  \"aleg_method\": \"POST\"\n}"
+            },
+            "description": "Transfer an in-progress call to a different URL for new call flow instructions."
+          }
+        },
+        {
+          "name": "Hang Up a Call",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Call/:call_uuid/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Call", ":call_uuid", ""],
+              "variable": [
+                { "key": "call_uuid", "value": "", "description": "UUID of the call to terminate" }
+              ]
+            },
+            "description": "Terminate an active call. Returns 204 No Content."
+          }
+        },
+        {
+          "name": "Retrieve All Live Calls",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Call/?status=live",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Call", ""],
+              "query": [
+                { "key": "status", "value": "live", "description": "Must be 'live'" }
+              ]
+            },
+            "description": "Get a list of all ongoing call UUIDs for your account."
+          }
+        },
+        {
+          "name": "Retrieve a Live Call",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Call/:call_uuid/?status=live",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Call", ":call_uuid", ""],
+              "query": [
+                { "key": "status", "value": "live", "description": "Must be 'live'" }
+              ],
+              "variable": [
+                { "key": "call_uuid", "value": "", "description": "UUID of the live call" }
+              ]
+            },
+            "description": "Get real-time information about a currently active call."
+          }
+        },
+        {
+          "name": "Retrieve All Queued Calls",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Call/?status=queued",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Call", ""],
+              "query": [
+                { "key": "status", "value": "queued", "description": "Must be 'queued'" }
+              ]
+            },
+            "description": "Get a list of all call UUIDs for calls currently queued and waiting to connect. Max 20 results."
+          }
+        },
+        {
+          "name": "Retrieve a Queued Call",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Call/:call_uuid/?status=queued",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Call", ":call_uuid", ""],
+              "query": [
+                { "key": "status", "value": "queued", "description": "Must be 'queued'" }
+              ],
+              "variable": [
+                { "key": "call_uuid", "value": "", "description": "UUID of the queued call" }
+              ]
+            },
+            "description": "Get details of a specific queued call."
+          }
+        },
+        {
+          "name": "Send DTMF Digits",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Call/:call_uuid/DTMF/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Call", ":call_uuid", "DTMF", ""],
+              "variable": [
+                { "key": "call_uuid", "value": "", "description": "UUID of the active call" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"digits\": \"1234#\",\n  \"leg\": \"aleg\"\n}"
+            },
+            "description": "Send DTMF digits to an active call for automated IVR navigation."
+          }
+        },
+        {
+          "name": "Play Audio on a Call",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Call/:call_uuid/Play/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Call", ":call_uuid", "Play", ""],
+              "variable": [
+                { "key": "call_uuid", "value": "", "description": "UUID of the active call" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"urls\": [\"https://example.com/audio.mp3\"],\n  \"length\": 120,\n  \"legs\": \"aleg\",\n  \"loop\": false,\n  \"mix\": true\n}"
+            },
+            "description": "Play audio file(s) during an active call."
+          }
+        },
+        {
+          "name": "Stop Playing Audio on a Call",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Call/:call_uuid/Play/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Call", ":call_uuid", "Play", ""],
+              "variable": [
+                { "key": "call_uuid", "value": "", "description": "UUID of the active call" }
+              ]
+            },
+            "description": "Stop audio playback on an active call. Returns 204 No Content."
+          }
+        },
+        {
+          "name": "Speak Text on a Call (TTS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Call/:call_uuid/Speak/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Call", ":call_uuid", "Speak", ""],
+              "variable": [
+                { "key": "call_uuid", "value": "", "description": "UUID of the active call" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Hello, this is a test message.\",\n  \"voice\": \"WOMAN\",\n  \"language\": \"en-US\",\n  \"legs\": \"aleg\",\n  \"loop\": false,\n  \"mix\": true\n}"
+            },
+            "description": "Convert text to speech and play it during an active call. Supports 29 languages."
+          }
+        },
+        {
+          "name": "Stop Speaking Text on a Call",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Call/:call_uuid/Speak/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Call", ":call_uuid", "Speak", ""],
+              "variable": [
+                { "key": "call_uuid", "value": "", "description": "UUID of the active call" }
+              ]
+            },
+            "description": "Stop text-to-speech playback. Returns 204 No Content."
+          }
+        },
+        {
+          "name": "Start Recording a Call",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Call/:call_uuid/Record/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Call", ":call_uuid", "Record", ""],
+              "variable": [
+                { "key": "call_uuid", "value": "", "description": "UUID of the active call" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"time_limit\": 60,\n  \"file_format\": \"mp3\",\n  \"callback_url\": \"https://example.com/recording-callback\",\n  \"callback_method\": \"POST\",\n  \"record_channel_type\": \"mono\"\n}"
+            },
+            "description": "Begin recording an active call."
+          }
+        },
+        {
+          "name": "Stop Recording a Call",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Call/:call_uuid/Record/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Call", ":call_uuid", "Record", ""],
+              "variable": [
+                { "key": "call_uuid", "value": "", "description": "UUID of the active call" }
+              ]
+            },
+            "description": "Stop active recording(s) on a call. Returns 204 No Content."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Conference",
+      "description": "Conference management, member control, audio playback, and recording.",
+      "item": [
+        {
+          "name": "List All Conferences",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Conference/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Conference", ""]
+            },
+            "description": "Retrieve a list of all ongoing conferences."
+          }
+        },
+        {
+          "name": "Retrieve a Conference",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Conference/:conference_name/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Conference", ":conference_name", ""],
+              "variable": [
+                { "key": "conference_name", "value": "", "description": "Name of the conference" }
+              ]
+            },
+            "description": "Get detailed information about a specific ongoing conference including all active members."
+          }
+        },
+        {
+          "name": "Hang Up a Conference",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Conference/:conference_name/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Conference", ":conference_name", ""],
+              "variable": [
+                { "key": "conference_name", "value": "", "description": "Name of the conference" }
+              ]
+            },
+            "description": "Terminate a specific conference and disconnect all participants. Returns 204 No Content."
+          }
+        },
+        {
+          "name": "Hang Up All Conferences",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Conference/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Conference", ""]
+            },
+            "description": "Terminate all ongoing conferences simultaneously. Returns 204 No Content."
+          }
+        },
+        {
+          "name": "Hang Up a Conference Member",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Conference/:conference_name/Member/:member_id/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Conference", ":conference_name", "Member", ":member_id", ""],
+              "variable": [
+                { "key": "conference_name", "value": "", "description": "Name of the conference" },
+                { "key": "member_id", "value": "", "description": "Member ID, comma-separated list, or 'all'" }
+              ]
+            },
+            "description": "Disconnect a member by terminating their call. Returns 204 No Content."
+          }
+        },
+        {
+          "name": "Kick a Conference Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Conference/:conference_name/Member/:member_id/Kick/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Conference", ":conference_name", "Member", ":member_id", "Kick", ""],
+              "variable": [
+                { "key": "conference_name", "value": "", "description": "Name of the conference" },
+                { "key": "member_id", "value": "", "description": "Member ID, comma-separated list, or 'all'" }
+              ]
+            },
+            "description": "Disconnect a member while allowing XML flow continuation."
+          }
+        },
+        {
+          "name": "Mute a Conference Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Conference/:conference_name/Member/:member_id/Mute/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Conference", ":conference_name", "Member", ":member_id", "Mute", ""],
+              "variable": [
+                { "key": "conference_name", "value": "", "description": "Name of the conference" },
+                { "key": "member_id", "value": "", "description": "Member ID, comma-separated list, or 'all'" }
+              ]
+            },
+            "description": "Mute member(s) so others cannot hear them."
+          }
+        },
+        {
+          "name": "Unmute a Conference Member",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Conference/:conference_name/Member/:member_id/Mute/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Conference", ":conference_name", "Member", ":member_id", "Mute", ""],
+              "variable": [
+                { "key": "conference_name", "value": "", "description": "Name of the conference" },
+                { "key": "member_id", "value": "", "description": "Member ID, comma-separated list, or 'all'" }
+              ]
+            },
+            "description": "Restore audio from previously muted members."
+          }
+        },
+        {
+          "name": "Deaf a Conference Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Conference/:conference_name/Member/:member_id/Deaf/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Conference", ":conference_name", "Member", ":member_id", "Deaf", ""],
+              "variable": [
+                { "key": "conference_name", "value": "", "description": "Name of the conference" },
+                { "key": "member_id", "value": "", "description": "Member ID, comma-separated list, or 'all'" }
+              ]
+            },
+            "description": "Prevent member(s) from hearing other participants."
+          }
+        },
+        {
+          "name": "Undeaf a Conference Member",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Conference/:conference_name/Member/:member_id/Deaf/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Conference", ":conference_name", "Member", ":member_id", "Deaf", ""],
+              "variable": [
+                { "key": "conference_name", "value": "", "description": "Name of the conference" },
+                { "key": "member_id", "value": "", "description": "Member ID, comma-separated list, or 'all'" }
+              ]
+            },
+            "description": "Restore audio reception for previously deafened members."
+          }
+        },
+        {
+          "name": "Play Audio to a Conference Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Conference/:conference_name/Member/:member_id/Play/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Conference", ":conference_name", "Member", ":member_id", "Play", ""],
+              "variable": [
+                { "key": "conference_name", "value": "", "description": "Name of the conference" },
+                { "key": "member_id", "value": "", "description": "Member ID, comma-separated list, or 'all'" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://example.com/audio.mp3\"\n}"
+            },
+            "description": "Play audio to specific member(s). Only targeted member(s) hear the audio."
+          }
+        },
+        {
+          "name": "Stop Playing Audio to a Conference Member",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Conference/:conference_name/Member/:member_id/Play/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Conference", ":conference_name", "Member", ":member_id", "Play", ""],
+              "variable": [
+                { "key": "conference_name", "value": "", "description": "Name of the conference" },
+                { "key": "member_id", "value": "", "description": "Member ID, comma-separated list, or 'all'" }
+              ]
+            },
+            "description": "Stop audio playback for specific member(s)."
+          }
+        },
+        {
+          "name": "Start Conference Recording",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Conference/:conference_name/Record/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Conference", ":conference_name", "Record", ""],
+              "variable": [
+                { "key": "conference_name", "value": "", "description": "Name of the conference" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"file_format\": \"mp3\",\n  \"recording_callback_url\": \"https://example.com/recording-callback\",\n  \"recording_callback_method\": \"POST\"\n}"
+            },
+            "description": "Begin recording a conference call."
+          }
+        },
+        {
+          "name": "Stop Conference Recording",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Conference/:conference_name/Record/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Conference", ":conference_name", "Record", ""],
+              "variable": [
+                { "key": "conference_name", "value": "", "description": "Name of the conference" }
+              ]
+            },
+            "description": "Stop an active conference recording. Returns 204 No Content."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recording",
+      "description": "Manage call recordings: list, retrieve, delete, bulk delete, and export.",
+      "item": [
+        {
+          "name": "List All Recordings",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{account_id}}/Recording/?limit=20&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{account_id}}", "Recording", ""],
+              "query": [
+                { "key": "limit", "value": "20", "description": "Records per request (default: 20, max: 100)" },
+                { "key": "offset", "value": "0", "description": "Pagination offset (default: 0)" },
+                { "key": "call_uuid", "value": "", "description": "Filter by specific call UUID", "disabled": true },
+                { "key": "recording_type", "value": "", "description": "Filter by type: trunk or extension", "disabled": true }
+              ]
+            },
+            "description": "Retrieve a paginated list of call recordings for your account."
+          }
+        },
+        {
+          "name": "Retrieve a Recording",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Recording/:recording_id/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Recording", ":recording_id", ""],
+              "variable": [
+                { "key": "recording_id", "value": "", "description": "ID of the recording" }
+              ]
+            },
+            "description": "Get detailed information about a specific recording."
+          }
+        },
+        {
+          "name": "Delete a Recording",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Recording/:recording_id/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Recording", ":recording_id", ""],
+              "variable": [
+                { "key": "recording_id", "value": "", "description": "ID of the recording to delete" }
+              ]
+            },
+            "description": "Permanently delete a specific recording. Returns 204 No Content."
+          }
+        },
+        {
+          "name": "Bulk Delete Recordings",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Recording/BulkDelete/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Recording", "BulkDelete", ""],
+              "query": [
+                { "key": "add_time__gte", "value": "", "description": "Delete recordings on/after this date (YYYY-MM-DD HH:MM:SS)", "disabled": true },
+                { "key": "add_time__lte", "value": "", "description": "Delete recordings on/before this date", "disabled": true },
+                { "key": "call_uuid", "value": "", "description": "Delete recordings for specific call UUID", "disabled": true },
+                { "key": "from_number", "value": "", "description": "Delete by caller number (partial match)", "disabled": true },
+                { "key": "to_number", "value": "", "description": "Delete by destination number (partial match)", "disabled": true },
+                { "key": "recording_format", "value": "", "description": "mp3 or wav", "disabled": true }
+              ]
+            },
+            "description": "Delete multiple recordings matching filter criteria (async operation). Returns 202 Accepted."
+          }
+        },
+        {
+          "name": "Export Historical Recordings",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/export/recording/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "export", "recording", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipient\": {\n    \"customer_account\": [\"user@example.com\"]\n  },\n  \"from\": \"2026-01-01 00:00:00\",\n  \"to\": \"2026-01-31 23:59:59\",\n  \"recording_format\": \"mp3\"\n}"
+            },
+            "description": "Export recordings as a downloadable archive sent via email (async). Returns 202 Accepted."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Account",
+      "description": "Account details, balance, transactions, and concurrency.",
+      "item": [
+        {
+          "name": "Retrieve Account Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "me"]
+            },
+            "description": "Retrieve complete account details including pricing tier, credentials, and account settings."
+          }
+        },
+        {
+          "name": "Get Balance",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/balance/INR",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "balance", "INR"]
+            },
+            "description": "Retrieve the balance for a specific account and currency. Replace 'INR' with your currency code."
+          }
+        },
+        {
+          "name": "Get Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/transactions?limit=50&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "transactions"],
+              "query": [
+                { "key": "limit", "value": "50", "description": "Records per page (default: 50)" },
+                { "key": "offset", "value": "0", "description": "Pagination offset (default: 0)" }
+              ]
+            },
+            "description": "Retrieve a list of transactions for a specific account."
+          }
+        },
+        {
+          "name": "Get Concurrency",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{auth_id}}/concurrency",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{auth_id}}", "concurrency"]
+            },
+            "description": "Retrieve current concurrent call count and capacity."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phone Numbers",
+      "description": "Manage account phone numbers, inventory browsing, purchasing, and releasing.",
+      "item": [
+        {
+          "name": "List Account Phone Numbers",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{auth_id}}/numbers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{auth_id}}", "numbers"]
+            },
+            "description": "Retrieve all phone numbers associated with your account."
+          }
+        },
+        {
+          "name": "List Inventory Numbers",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{auth_id}}/inventory/numbers?country=US&page=1&per_page=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{auth_id}}", "inventory", "numbers"],
+              "query": [
+                { "key": "country", "value": "US", "description": "Filter by country code" },
+                { "key": "page", "value": "1", "description": "Page number" },
+                { "key": "per_page", "value": "20", "description": "Results per page" }
+              ]
+            },
+            "description": "Browse available phone numbers in inventory for purchase."
+          }
+        },
+        {
+          "name": "Purchase from Inventory",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{auth_id}}/numbers/purchase-from-inventory",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{auth_id}}", "numbers", "purchase-from-inventory"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"number\": \"+1XXXXXXXXXX\"\n}"
+            },
+            "description": "Purchase a phone number from available inventory."
+          }
+        },
+        {
+          "name": "Unrent a Phone Number",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{auth_id}}/numbers/:e164_number",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{auth_id}}", "numbers", ":e164_number"],
+              "variable": [
+                { "key": "e164_number", "value": "", "description": "Phone number in E.164 format" }
+              ]
+            },
+            "description": "Release (unrent) a phone number from your account."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Application",
+      "description": "Create and manage applications with call handling URLs and number linking.",
+      "item": [
+        {
+          "name": "Create Application",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Application/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Application", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"app_name\": \"My Application\",\n  \"answer_url\": \"https://example.com/answer\",\n  \"answer_method\": \"POST\",\n  \"hangup_url\": \"https://example.com/hangup\",\n  \"hangup_method\": \"POST\",\n  \"fallback_answer_url\": \"https://example.com/fallback\",\n  \"fallback_method\": \"POST\",\n  \"message_url\": \"https://example.com/message\",\n  \"message_method\": \"POST\"\n}"
+            },
+            "description": "Create a new application with call handling URLs."
+          }
+        },
+        {
+          "name": "List All Applications",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Application/?limit=20&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Application", ""],
+              "query": [
+                { "key": "limit", "value": "20", "description": "Results per page" },
+                { "key": "offset", "value": "0", "description": "Pagination offset" }
+              ]
+            },
+            "description": "Retrieve all applications with pagination."
+          }
+        },
+        {
+          "name": "Retrieve an Application",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Application/:app_id/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Application", ":app_id", ""],
+              "variable": [
+                { "key": "app_id", "value": "", "description": "Application ID" }
+              ]
+            },
+            "description": "Get details of a specific application by its ID."
+          }
+        },
+        {
+          "name": "Update an Application",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Application/:app_id/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Application", ":app_id", ""],
+              "variable": [
+                { "key": "app_id", "value": "", "description": "Application ID" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"app_name\": \"Updated Application Name\",\n  \"answer_url\": \"https://example.com/new-answer\",\n  \"answer_method\": \"POST\"\n}"
+            },
+            "description": "Update an existing application's settings."
+          }
+        },
+        {
+          "name": "Delete an Application",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Application/:app_id/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Application", ":app_id", ""],
+              "variable": [
+                { "key": "app_id", "value": "", "description": "Application ID" }
+              ]
+            },
+            "description": "Delete an application. Returns 204 No Content."
+          }
+        },
+        {
+          "name": "Link Number to Application",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{auth_id}}/numbers/:number/application",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{auth_id}}", "numbers", ":number", "application"],
+              "variable": [
+                { "key": "number", "value": "", "description": "Phone number in E.164 format" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"app_id\": \"your_application_id\"\n}"
+            },
+            "description": "Associate a phone number with an application."
+          }
+        },
+        {
+          "name": "Unlink Number from Application",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{auth_id}}/numbers/:number/application",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{auth_id}}", "numbers", ":number", "application"],
+              "variable": [
+                { "key": "number", "value": "", "description": "Phone number in E.164 format" }
+              ]
+            },
+            "description": "Remove association between a phone number and application."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Endpoint",
+      "description": "Manage SIP endpoints for voice communication.",
+      "item": [
+        {
+          "name": "Create Endpoint",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Endpoint/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Endpoint", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"myendpoint\",\n  \"password\": \"securepassword\",\n  \"alias\": \"My SIP Endpoint\",\n  \"app_id\": \"your_application_id\"\n}"
+            },
+            "description": "Create a new SIP endpoint."
+          }
+        },
+        {
+          "name": "List All Endpoints",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Endpoint/?limit=20&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Endpoint", ""],
+              "query": [
+                { "key": "limit", "value": "20", "description": "Results per page" },
+                { "key": "offset", "value": "0", "description": "Pagination offset" }
+              ]
+            },
+            "description": "Retrieve all endpoints with pagination."
+          }
+        },
+        {
+          "name": "Retrieve an Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Endpoint/:endpoint_id/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Endpoint", ":endpoint_id", ""],
+              "variable": [
+                { "key": "endpoint_id", "value": "", "description": "Endpoint ID" }
+              ]
+            },
+            "description": "Get details of a specific endpoint."
+          }
+        },
+        {
+          "name": "Update an Endpoint",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Endpoint/:endpoint_id/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Endpoint", ":endpoint_id", ""],
+              "variable": [
+                { "key": "endpoint_id", "value": "", "description": "Endpoint ID" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alias\": \"Updated Endpoint Name\",\n  \"password\": \"newsecurepassword\"\n}"
+            },
+            "description": "Update an existing endpoint's configuration."
+          }
+        },
+        {
+          "name": "Delete an Endpoint",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/Account/{{auth_id}}/Endpoint/:endpoint_id/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "Account", "{{auth_id}}", "Endpoint", ":endpoint_id", ""],
+              "variable": [
+                { "key": "endpoint_id", "value": "", "description": "Endpoint ID" }
+              ]
+            },
+            "description": "Delete an endpoint. Returns 204 No Content."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trunk",
+      "description": "SIP trunk management including credentials, IP ACLs, origination URIs, and number assignment.",
+      "item": [
+        {
+          "name": "Create Trunk",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/trunks",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "trunks"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My SIP Trunk\",\n  \"description\": \"Production trunk\"\n}"
+            },
+            "description": "Create a new SIP trunk."
+          }
+        },
+        {
+          "name": "List All Trunks",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/trunks?limit=20&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "trunks"],
+              "query": [
+                { "key": "limit", "value": "20", "description": "Results per page" },
+                { "key": "offset", "value": "0", "description": "Pagination offset" }
+              ]
+            },
+            "description": "Retrieve all trunks."
+          }
+        },
+        {
+          "name": "Retrieve a Trunk",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/trunks/:trunk_id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "trunks", ":trunk_id"],
+              "variable": [
+                { "key": "trunk_id", "value": "", "description": "Trunk ID" }
+              ]
+            },
+            "description": "Get details of a specific trunk."
+          }
+        },
+        {
+          "name": "Update a Trunk",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/trunks/:trunk_id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "trunks", ":trunk_id"],
+              "variable": [
+                { "key": "trunk_id", "value": "", "description": "Trunk ID" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Trunk Name\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "description": "Update an existing trunk."
+          }
+        },
+        {
+          "name": "Delete a Trunk",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/trunks/:trunk_id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "trunks", ":trunk_id"],
+              "variable": [
+                { "key": "trunk_id", "value": "", "description": "Trunk ID" }
+              ]
+            },
+            "description": "Delete a trunk. Returns 204 No Content."
+          }
+        },
+        {
+          "name": "Assign Number to Trunk",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/numbers/:phone_number/assign",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "numbers", ":phone_number", "assign"],
+              "variable": [
+                { "key": "phone_number", "value": "", "description": "Phone number in E.164 format" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trunk_group_id\": \"your_trunk_group_id\"\n}"
+            },
+            "description": "Assign a phone number to a trunk group."
+          }
+        },
+        {
+          "name": "Unassign Number from Trunk",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/numbers/:phone_number/assign",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "numbers", ":phone_number", "assign"],
+              "variable": [
+                { "key": "phone_number", "value": "", "description": "Phone number in E.164 format" }
+              ]
+            },
+            "description": "Remove a phone number from its trunk assignment. Returns 204 No Content."
+          }
+        },
+        {
+          "name": "Create Credential",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/credentials",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "credentials"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"sip_user\",\n  \"password\": \"securepassword\",\n  \"trunk_id\": \"your_trunk_id\"\n}"
+            },
+            "description": "Create SIP authentication credentials for a trunk."
+          }
+        },
+        {
+          "name": "List All Credentials",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/trunks/credentials?limit=20&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "trunks", "credentials"],
+              "query": [
+                { "key": "limit", "value": "20", "description": "Results per page" },
+                { "key": "offset", "value": "0", "description": "Pagination offset" }
+              ]
+            },
+            "description": "Retrieve all SIP credentials."
+          }
+        },
+        {
+          "name": "Update a Credential",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/credentials/:credential_id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "credentials", ":credential_id"],
+              "variable": [
+                { "key": "credential_id", "value": "", "description": "Credential ID" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"newpassword\"\n}"
+            },
+            "description": "Update SIP credential settings."
+          }
+        },
+        {
+          "name": "Delete a Credential",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/credentials/:credential_id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "credentials", ":credential_id"],
+              "variable": [
+                { "key": "credential_id", "value": "", "description": "Credential ID" }
+              ]
+            },
+            "description": "Delete a SIP credential. Returns 204 No Content."
+          }
+        },
+        {
+          "name": "Create IP ACL",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/ip-acl",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "ip-acl"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ip_address\": \"203.0.113.0/24\",\n  \"description\": \"Office IP range\",\n  \"trunk_id\": \"your_trunk_id\"\n}"
+            },
+            "description": "Create an IP Access Control List entry for trunk authentication."
+          }
+        },
+        {
+          "name": "List All IP ACLs",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/trunks/ip-acl?limit=20&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "trunks", "ip-acl"],
+              "query": [
+                { "key": "limit", "value": "20", "description": "Results per page" },
+                { "key": "offset", "value": "0", "description": "Pagination offset" }
+              ]
+            },
+            "description": "Retrieve all IP ACL entries."
+          }
+        },
+        {
+          "name": "Update an IP ACL",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/ip-acl/:ip_acl_id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "ip-acl", ":ip_acl_id"],
+              "variable": [
+                { "key": "ip_acl_id", "value": "", "description": "IP ACL ID" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ip_address\": \"203.0.113.0/24\",\n  \"description\": \"Updated office IP range\"\n}"
+            },
+            "description": "Update an IP ACL entry."
+          }
+        },
+        {
+          "name": "Delete an IP ACL",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/ip-acl/:ip_acl_id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "ip-acl", ":ip_acl_id"],
+              "variable": [
+                { "key": "ip_acl_id", "value": "", "description": "IP ACL ID" }
+              ]
+            },
+            "description": "Delete an IP ACL entry. Returns 204 No Content."
+          }
+        },
+        {
+          "name": "Create Origination URI",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/origination-uris",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "origination-uris"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sip_uri\": \"sip:example.com:5060\",\n  \"priority\": 1,\n  \"weight\": 100,\n  \"trunk_id\": \"your_trunk_id\"\n}"
+            },
+            "description": "Create an origination URI for inbound SIP routing."
+          }
+        },
+        {
+          "name": "List All Origination URIs",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/trunks/origination-uris?limit=20&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "trunks", "origination-uris"],
+              "query": [
+                { "key": "limit", "value": "20", "description": "Results per page" },
+                { "key": "offset", "value": "0", "description": "Pagination offset" }
+              ]
+            },
+            "description": "Retrieve all origination URIs."
+          }
+        },
+        {
+          "name": "Update an Origination URI",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/origination-uris/:uri_id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "origination-uris", ":uri_id"],
+              "variable": [
+                { "key": "uri_id", "value": "", "description": "Origination URI ID" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sip_uri\": \"sip:updated.example.com:5060\",\n  \"priority\": 1,\n  \"weight\": 100\n}"
+            },
+            "description": "Update an origination URI."
+          }
+        },
+        {
+          "name": "Delete an Origination URI",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/origination-uris/:uri_id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "origination-uris", ":uri_id"],
+              "variable": [
+                { "key": "uri_id", "value": "", "description": "Origination URI ID" }
+              ]
+            },
+            "description": "Delete an origination URI. Returns 204 No Content."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sub-Account",
+      "description": "Create and manage sub-accounts under the master account.",
+      "item": [
+        {
+          "name": "Create Sub-Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/accounts/{{account_id}}/sub-accounts/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "accounts", "{{account_id}}", "sub-accounts", ""]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My Sub-Account\",\n  \"description\": \"Sub-account for department X\"\n}"
+            },
+            "description": "Create a new sub-account under the master account."
+          }
+        },
+        {
+          "name": "List All Sub-Accounts",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/accounts/{{account_id}}/sub-accounts/?page=1&size=20&active_only=true",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "accounts", "{{account_id}}", "sub-accounts", ""],
+              "query": [
+                { "key": "page", "value": "1", "description": "Page number" },
+                { "key": "size", "value": "20", "description": "Results per page" },
+                { "key": "active_only", "value": "true", "description": "Filter active sub-accounts only", "disabled": true }
+              ]
+            },
+            "description": "Retrieve all sub-accounts."
+          }
+        },
+        {
+          "name": "Retrieve a Sub-Account",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/accounts/{{account_id}}/sub-accounts/:sub_account_id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "accounts", "{{account_id}}", "sub-accounts", ":sub_account_id"],
+              "variable": [
+                { "key": "sub_account_id", "value": "", "description": "Sub-account ID" }
+              ]
+            },
+            "description": "Get details of a specific sub-account."
+          }
+        },
+        {
+          "name": "Update a Sub-Account",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/accounts/{{account_id}}/sub-accounts/:sub_account_id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "accounts", "{{account_id}}", "sub-accounts", ":sub_account_id"],
+              "variable": [
+                { "key": "sub_account_id", "value": "", "description": "Sub-account ID" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Sub-Account Name\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "description": "Update sub-account settings."
+          }
+        },
+        {
+          "name": "Delete a Sub-Account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/accounts/{{account_id}}/sub-accounts/:sub_account_id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "accounts", "{{account_id}}", "sub-accounts", ":sub_account_id"],
+              "variable": [
+                { "key": "sub_account_id", "value": "", "description": "Sub-account ID" }
+              ]
+            },
+            "description": "Delete a sub-account. Returns 204 No Content."
+          }
+        }
+      ]
+    },
+    {
+      "name": "CDR",
+      "description": "Call Detail Records for reporting and analytics.",
+      "item": [
+        {
+          "name": "Get Call Detail Records",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-Auth-ID", "value": "{{auth_id}}" },
+              { "key": "X-Auth-Token", "value": "{{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/account/{{account_id}}/cdr?start_date=2026-01-01&end_date=2026-01-31&per_page=50&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "account", "{{account_id}}", "cdr"],
+              "query": [
+                { "key": "start_date", "value": "2026-01-01", "description": "Start date (YYYY-MM-DD)" },
+                { "key": "end_date", "value": "2026-01-31", "description": "End date (YYYY-MM-DD)" },
+                { "key": "per_page", "value": "50", "description": "Results per page" },
+                { "key": "page", "value": "1", "description": "Page number" }
+              ]
+            },
+            "description": "Retrieve call detail records with filtering and pagination."
+          }
+        }
+      ]
+    }
+  ]
+}

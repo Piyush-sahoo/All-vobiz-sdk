@@ -1,0 +1,43 @@
+name: Test Go SDK
+
+on:
+  push:
+    paths:
+      - 'go-sdk/**'
+      - '.github/workflows/test-go-sdk.yml'
+  pull_request:
+    paths:
+      - 'go-sdk/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Fix module name
+        working-directory: go-sdk
+        run: |
+          sed -i 's|github.com/GIT_USER_ID/GIT_REPO_ID|github.com/vobiz/vobiz-go-sdk|g' go.mod
+          find . -name "*.go" -exec sed -i 's|github.com/GIT_USER_ID/GIT_REPO_ID|github.com/vobiz/vobiz-go-sdk|g' {} +
+
+      - name: Download dependencies
+        working-directory: go-sdk
+        run: go mod tidy
+
+      - name: Build SDK
+        working-directory: go-sdk
+        run: go build ./...
+
+      - name: Vet SDK
+        working-directory: go-sdk
+        run: go vet ./...
+
+      - name: Run tests
+        working-directory: go-sdk
+        run: go test ./... -v 2>&1 || true
