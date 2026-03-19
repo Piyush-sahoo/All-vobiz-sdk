@@ -183,3 +183,44 @@ jobs:
           VOBIZ_AUTH_ID: ${{ secrets.VOBIZ_AUTH_ID }}
           VOBIZ_AUTH_TOKEN: ${{ secrets.VOBIZ_AUTH_TOKEN }}
         run: dart test/integration/vobiz_integration_test.dart
+
+  # ─── Python ────────────────────────────────────────────────────────────────
+  python-sdk:
+    name: Python SDK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        working-directory: python-sdk
+        run: pip install -r requirements.txt -r test-requirements.txt && pip install -e .
+      - name: Run integration tests
+        working-directory: python-sdk
+        env:
+          VOBIZ_AUTH_ID: ${{ secrets.VOBIZ_AUTH_ID }}
+          VOBIZ_AUTH_TOKEN: ${{ secrets.VOBIZ_AUTH_TOKEN }}
+        run: pytest test/integration/test_vobiz_integration.py -v
+
+  # ─── Node.js / TypeScript ──────────────────────────────────────────────────
+  node-sdk:
+    name: Node.js SDK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        working-directory: node-sdk
+        run: npm install
+      - name: Build TypeScript
+        working-directory: node-sdk
+        run: npm run build
+      - name: Run integration tests
+        working-directory: node-sdk
+        env:
+          VOBIZ_AUTH_ID: ${{ secrets.VOBIZ_AUTH_ID }}
+          VOBIZ_AUTH_TOKEN: ${{ secrets.VOBIZ_AUTH_TOKEN }}
+        run: npm run integration
