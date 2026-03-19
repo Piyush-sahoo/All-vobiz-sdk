@@ -46,37 +46,37 @@ function runTest(string $name, callable $fn): void {
 }
 
 // Test 1: Get Account Details
-runTest('GetAccountDetails', function() use ($config) {
+runTest('GetAccountDetails', function() use ($config, $authId, $authToken) {
     $api = new AccountApi(null, $config);
-    $result = $api->apiV1AuthMeGet();
+    $api->apiV1AuthMeGet($authId, $authToken, 'application/json');
     echo "  -> Response received OK\n";
 });
 
 // Test 2: Get Live Calls
-runTest('GetLiveCalls', function() use ($config, $authId) {
+runTest('GetLiveCalls', function() use ($config, $authId, $authToken) {
     $api = new CallApi(null, $config);
-    $result = $api->apiV1AccountAuthIdCallGet($authId, 'live');
+    $api->apiV1AccountAuthIdCallGet($authId, $authId, $authToken, 'application/json', 'live');
     echo "  -> Response received OK\n";
 });
 
 // Test 3: List Recordings
-runTest('ListRecordings', function() use ($config, $authId) {
+runTest('ListRecordings', function() use ($config, $authId, $authToken) {
     $api = new RecordingApi(null, $config);
-    $result = $api->apiV1AccountAccountIdRecordingGet($authId, 20, 0);
+    $api->apiV1AccountAccountIdRecordingGet($authId, $authId, $authToken, 'application/json', 20, 0);
     echo "  -> Response received OK\n";
 });
 
 // Test 4: List Conferences
-runTest('ListConferences', function() use ($config, $authId) {
+runTest('ListConferences', function() use ($config, $authId, $authToken) {
     $api = new ConferenceApi(null, $config);
-    $result = $api->apiV1AccountAuthIdConferenceGet($authId);
+    $api->apiV1AccountAuthIdConferenceGet($authId, $authId, $authToken, 'application/json');
     echo "  -> Response received OK\n";
 });
 
 // Test 5: List Applications
-runTest('ListApplications', function() use ($config, $authId) {
+runTest('ListApplications', function() use ($config, $authId, $authToken) {
     $api = new ApplicationApi(null, $config);
-    $result = $api->apiV1AccountAuthIdApplicationGet($authId);
+    $api->apiV1AccountAuthIdApplicationGet($authId, $authId, $authToken, 'application/json', 20, 0);
     echo "  -> Response received OK\n";
 });
 

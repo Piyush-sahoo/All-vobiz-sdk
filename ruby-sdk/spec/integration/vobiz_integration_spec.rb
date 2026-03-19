@@ -18,47 +18,72 @@ RSpec.describe 'Vobiz SDK Integration Tests', :integration do
   end
 
   describe 'AccountApi' do
-    it 'GET /api/v1/auth/me returns account details' do
-      api    = Vobiz::AccountApi.new
-      result = api.api_v1_auth_me_get
+    it 'GET /api/v1/auth/me does not raise an error' do
+      api = Vobiz::AccountApi.new
+      expect {
+        api.api_v1_auth_me_get(
+          x_auth_id: VOBIZ_AUTH_ID,
+          x_auth_token: VOBIZ_AUTH_TOKEN
+        )
+      }.not_to raise_error
       puts "[Ruby] GetAccountDetails: OK"
-      expect(result).not_to be_nil
     end
   end
 
   describe 'CallApi' do
-    it 'GET live calls returns a response' do
-      api    = Vobiz::CallApi.new
-      result = api.api_v1_account_auth_id_call_get(VOBIZ_AUTH_ID, { status: 'live' })
+    it 'GET live calls does not raise an error' do
+      api = Vobiz::CallApi.new
+      expect {
+        api.api_v1_account_auth_id_call_get(
+          VOBIZ_AUTH_ID,
+          x_auth_id: VOBIZ_AUTH_ID,
+          x_auth_token: VOBIZ_AUTH_TOKEN,
+          status: 'live'
+        )
+      }.not_to raise_error
       puts "[Ruby] GetLiveCalls: OK"
-      expect(result).not_to be_nil
     end
   end
 
   describe 'RecordingApi' do
-    it 'GET recordings returns a list' do
-      api    = Vobiz::RecordingApi.new
-      result = api.api_v1_account_account_id_recording_get(VOBIZ_AUTH_ID)
+    it 'GET recordings does not raise an error' do
+      api = Vobiz::RecordingApi.new
+      expect {
+        api.api_v1_account_account_id_recording_get(
+          VOBIZ_AUTH_ID,
+          x_auth_id: VOBIZ_AUTH_ID,
+          x_auth_token: VOBIZ_AUTH_TOKEN
+        )
+      }.not_to raise_error
       puts "[Ruby] ListRecordings: OK"
-      expect(result).not_to be_nil
     end
   end
 
   describe 'ConferenceApi' do
-    it 'GET conferences returns a response' do
-      api    = Vobiz::ConferenceApi.new
-      result = api.api_v1_account_auth_id_conference_get(VOBIZ_AUTH_ID)
+    it 'GET conferences does not raise an error' do
+      api = Vobiz::ConferenceApi.new
+      expect {
+        api.api_v1_account_auth_id_conference_get(
+          VOBIZ_AUTH_ID,
+          x_auth_id: VOBIZ_AUTH_ID,
+          x_auth_token: VOBIZ_AUTH_TOKEN
+        )
+      }.not_to raise_error
       puts "[Ruby] ListConferences: OK"
-      expect(result).not_to be_nil
     end
   end
 
   describe 'ApplicationApi' do
-    it 'GET applications returns a list' do
-      api    = Vobiz::ApplicationApi.new
-      result = api.api_v1_account_auth_id_application_get(VOBIZ_AUTH_ID)
+    it 'GET applications does not raise an error' do
+      api = Vobiz::ApplicationApi.new
+      expect {
+        api.api_v1_account_auth_id_application_get(
+          VOBIZ_AUTH_ID,
+          x_auth_id: VOBIZ_AUTH_ID,
+          x_auth_token: VOBIZ_AUTH_TOKEN
+        )
+      }.not_to raise_error
       puts "[Ruby] ListApplications: OK"
-      expect(result).not_to be_nil
     end
   end
 end

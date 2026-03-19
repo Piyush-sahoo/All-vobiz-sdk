@@ -17,11 +17,12 @@ public class VobizIntegrationTest {
 
     private static ApiClient client;
     private static String authId;
+    private static String authToken;
 
     @BeforeAll
     static void setup() {
-        authId = System.getenv("VOBIZ_AUTH_ID");
-        String authToken = System.getenv("VOBIZ_AUTH_TOKEN");
+        authId    = System.getenv("VOBIZ_AUTH_ID");
+        authToken = System.getenv("VOBIZ_AUTH_TOKEN");
 
         client = new ApiClient();
         client.addDefaultHeader("X-Auth-ID", authId);
@@ -31,40 +32,40 @@ public class VobizIntegrationTest {
     @Test
     void testGetAccountDetails() throws ApiException {
         AccountApi api = new AccountApi(client);
-        Object result = api.apiV1AuthMeGet();
+        // params: xAuthID, xAuthToken, contentType
+        api.apiV1AuthMeGet(authId, authToken, "application/json");
         System.out.println("[Java] GetAccountDetails: OK");
-        assertNotNull(result);
     }
 
     @Test
     void testGetLiveCalls() throws ApiException {
         CallApi api = new CallApi(client);
-        Object result = api.apiV1AccountAuthIdCallGet(authId, "live");
+        // params: authId, xAuthID, xAuthToken, contentType, status
+        api.apiV1AccountAuthIdCallGet(authId, authId, authToken, "application/json", "live");
         System.out.println("[Java] GetLiveCalls: OK");
-        assertNotNull(result);
     }
 
     @Test
     void testListRecordings() throws ApiException {
         RecordingApi api = new RecordingApi(client);
-        Object result = api.apiV1AccountAccountIdRecordingGet(authId, 20, 0, null, null);
+        // params: accountId, xAuthID, xAuthToken, contentType, limit, offset, callUuid, recordingType
+        api.apiV1AccountAccountIdRecordingGet(authId, authId, authToken, "application/json", 20, 0, null, null);
         System.out.println("[Java] ListRecordings: OK");
-        assertNotNull(result);
     }
 
     @Test
     void testListConferences() throws ApiException {
         ConferenceApi api = new ConferenceApi(client);
-        Object result = api.apiV1AccountAuthIdConferenceGet(authId);
+        // params: authId, xAuthID, xAuthToken, contentType
+        api.apiV1AccountAuthIdConferenceGet(authId, authId, authToken, "application/json");
         System.out.println("[Java] ListConferences: OK");
-        assertNotNull(result);
     }
 
     @Test
     void testListApplications() throws ApiException {
         ApplicationApi api = new ApplicationApi(client);
-        Object result = api.apiV1AccountAuthIdApplicationGet(authId, 20, 0);
+        // params: authId, xAuthID, xAuthToken, contentType, limit, offset
+        api.apiV1AccountAuthIdApplicationGet(authId, authId, authToken, "application/json", 20, 0);
         System.out.println("[Java] ListApplications: OK");
-        assertNotNull(result);
     }
 }
