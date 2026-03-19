@@ -45,7 +45,7 @@ jobs:
           php-version: '8.2'
           extensions: curl, json, mbstring
           tools: composer
-      - run: composer install --no-interaction --prefer-dist
+      - run: composer install --no-interaction --prefer-dist && composer dump-autoload -o
         working-directory: php-sdk
       - name: Lint all PHP files
         working-directory: php-sdk

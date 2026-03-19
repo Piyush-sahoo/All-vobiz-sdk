@@ -42,7 +42,7 @@ func Test_Integration_GetAccountDetails(t *testing.T) {
 func Test_Integration_GetLiveCalls(t *testing.T) {
 	client, authID := getIntegrationClient(t)
 
-	httpRes, err := client.CallAPI.ApiV1AccountAuthIdCallGet(context.Background(), authID).Execute()
+	httpRes, err := client.CallAPI.ApiV1AccountAuthIdCallGet(context.Background(), authID).Status("live").Execute()
 	if err != nil {
 		t.Fatalf("GetLiveCalls failed: %v (HTTP %d)", err, httpRes.StatusCode)
 	}

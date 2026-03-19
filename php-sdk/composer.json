@@ -30,7 +30,10 @@
         "friendsofphp/php-cs-fixer": "^3.5"
     },
     "autoload": {
-        "psr-4": { "Vobiz\\" : "lib/" }
+        "psr-4": {
+            "Vobiz\\" : "lib/",
+            "Vobiz\\VobizApi\\" : "lib/Api/"
+        }
     },
     "autoload-dev": {
         "psr-4": { "Vobiz\\Test\\" : "test/" }
