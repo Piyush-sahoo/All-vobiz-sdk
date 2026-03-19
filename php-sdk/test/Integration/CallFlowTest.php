@@ -11,6 +11,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use Vobiz\Configuration;
 use Vobiz\ApiException;
 use Vobiz\VobizApi\CallApi;
+use GuzzleHttp\Client;
 
 $authId         = getenv('VOBIZ_AUTH_ID');
 $authToken      = getenv('VOBIZ_AUTH_TOKEN');
@@ -51,23 +52,29 @@ function step(string $name, callable $fn): void {
     }
 }
 
-// STEP 1: Make outbound call
+// STEP 1: Make outbound call — use Guzzle directly to capture response body
 echo "\n[PHP] STEP 1: Making outbound call...\n";
 $requestUUID = null;
-step('Make Call', function() use ($api, $authId, $authToken, $fromNumber, $toNumber, &$requestUUID) {
-    $result = $api->apiV1AccountAuthIdCallPost(
-        $authId, $authId, $authToken, 'application/json',
-        [
-            'from'           => $fromNumber,
-            'to'             => $toNumber,
-            'answer_url'     => ANSWER_URL,
-            'answer_method'  => 'POST',
-            'hangup_url'     => HANGUP_URL,
-            'hangup_method'  => 'POST',
-        ]
-    );
-    $data = is_array($result) ? $result : json_decode(json_encode($result), true);
-    $requestUUID = $data['request_uuid'] ?? ($data['objects'][0]['request_uuid'] ?? null);
+step('Make Call', function() use ($authId, $authToken, $fromNumber, $toNumber, &$requestUUID) {
+    $guzzle   = new Client();
+    $response = $guzzle->post("https://api.vobiz.ai/api/v1/Account/{$authId}/Call/", [
+        'headers' => [
+            'X-Auth-ID'    => $authId,
+            'X-Auth-Token' => $authToken,
+            'Content-Type' => 'application/json',
+        ],
+        'json' => [
+            'from'          => $fromNumber,
+            'to'            => $toNumber,
+            'answer_url'    => ANSWER_URL,
+            'answer_method' => 'POST',
+            'hangup_url'    => HANGUP_URL,
+            'hangup_method' => 'POST',
+        ],
+    ]);
+    $data = json_decode((string) $response->getBody(), true);
+    $requestUUID = $data['request_uuid']
+        ?? ($data['objects'][0]['request_uuid'] ?? null);
     if (!$requestUUID) throw new Exception("No request_uuid in response: " . json_encode($data));
     echo "  -> request_uuid = $requestUUID\n";
 });

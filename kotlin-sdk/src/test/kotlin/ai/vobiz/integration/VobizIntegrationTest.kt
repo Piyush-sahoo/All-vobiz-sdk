@@ -5,68 +5,45 @@ import ai.vobiz.infrastructure.ApiClient
 
 /**
  * Vobiz Kotlin SDK - Integration Tests (Read-Only)
- * Run: ./gradlew integrationTest
- * Requires: VOBIZ_AUTH_ID and VOBIZ_AUTH_TOKEN env vars
+ * Auth passed per-call via xAuthID/xAuthToken params.
  */
 fun main() {
-    val authId    = System.getenv("VOBIZ_AUTH_ID")
-    val authToken = System.getenv("VOBIZ_AUTH_TOKEN")
+    val authId    = System.getenv("VOBIZ_AUTH_ID")    ?: ""
+    val authToken = System.getenv("VOBIZ_AUTH_TOKEN") ?: ""
 
-    if (authId.isNullOrEmpty() || authToken.isNullOrEmpty()) {
+    if (authId.isEmpty() || authToken.isEmpty()) {
         println("SKIP: VOBIZ_AUTH_ID or VOBIZ_AUTH_TOKEN not set")
         return
     }
 
-    val client = ApiClient(
-        baseUrl = "https://api.vobiz.ai",
-        bearerToken = null
-    ).apply {
-        addDefaultHeader("X-Auth-ID", authId)
-        addDefaultHeader("X-Auth-Token", authToken)
-    }
-
+    val client = ApiClient(baseUrl = "https://api.vobiz.ai")
     var passed = 0
     var failed = 0
 
     fun runTest(name: String, block: () -> Unit) {
-        try {
-            block()
-            println("[Kotlin] PASS: $name")
-            passed++
-        } catch (e: Exception) {
-            println("[Kotlin] FAIL: $name - ${e.message}")
-            failed++
-        }
+        try { block(); println("[Kotlin] PASS: $name"); passed++ }
+        catch (e: Exception) { println("[Kotlin] FAIL: $name - ${e.message}"); failed++ }
     }
 
     runTest("GetAccountDetails") {
-        val api = AccountApi(client)
-        val result = api.apiV1AuthMeGet()
-        println("  -> Response received OK")
+        AccountApi(client).apiV1AuthMeGet(xAuthID = authId, xAuthToken = authToken)
+        println("  -> OK")
     }
-
     runTest("GetLiveCalls") {
-        val api = CallApi(client)
-        val result = api.apiV1AccountAuthIdCallGet(authId, status = "live")
-        println("  -> Response received OK")
+        CallApi(client).apiV1AccountAuthIdCallGet(authId, xAuthID = authId, xAuthToken = authToken, status = "live")
+        println("  -> OK")
     }
-
     runTest("ListRecordings") {
-        val api = RecordingApi(client)
-        val result = api.apiV1AccountAccountIdRecordingGet(authId)
-        println("  -> Response received OK")
+        RecordingApi(client).apiV1AccountAccountIdRecordingGet(authId, xAuthID = authId, xAuthToken = authToken)
+        println("  -> OK")
     }
-
     runTest("ListConferences") {
-        val api = ConferenceApi(client)
-        val result = api.apiV1AccountAuthIdConferenceGet(authId)
-        println("  -> Response received OK")
+        ConferenceApi(client).apiV1AccountAuthIdConferenceGet(authId, xAuthID = authId, xAuthToken = authToken)
+        println("  -> OK")
     }
-
     runTest("ListApplications") {
-        val api = ApplicationApi(client)
-        val result = api.apiV1AccountAuthIdApplicationGet(authId)
-        println("  -> Response received OK")
+        ApplicationApi(client).apiV1AccountAuthIdApplicationGet(authId, xAuthID = authId, xAuthToken = authToken)
+        println("  -> OK")
     }
 
     println("\n[Kotlin] Results: $passed passed, $failed failed")
