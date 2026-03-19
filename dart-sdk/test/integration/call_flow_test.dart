@@ -60,7 +60,7 @@ Future<void> main() async {
       'hangup_url': hangupUrl, 'hangup_method': 'POST',
     });
     requestUUID = data['request_uuid'] as String? ??
-        ((data['objects'] as List?)?.first as Map?)?.get('request_uuid') as String? ?? '';
+        ((data['objects'] as List?)?.first as Map?)?['request_uuid'] as String? ?? '';
     if (requestUUID.isEmpty) throw Exception('No request_uuid in: $data');
     print('  -> request_uuid = $requestUUID');
   });
