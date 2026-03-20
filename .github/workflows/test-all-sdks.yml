@@ -300,9 +300,6 @@ jobs:
       - name: Install dependencies
         working-directory: node-sdk
         run: npm install
-      - name: Build TypeScript
-        working-directory: node-sdk
-        run: npm run build
       - name: Run integration tests
         working-directory: node-sdk
         env:
