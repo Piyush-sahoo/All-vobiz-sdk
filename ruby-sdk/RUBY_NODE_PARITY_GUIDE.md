@@ -173,3 +173,24 @@ call = client.calls.create(
 
 client.calls.speak_text(call['callUuid'], 'Welcome to Vobiz')
 ```
+
+## Internal integration tests
+
+File:
+- [ruby-sdk/spec/integration/internal_vobiz_server_spec.rb](spec/integration/internal_vobiz_server_spec.rb)
+
+This test validates:
+- modern endpoint reachability
+- legacy endpoint reachability
+- XML generator outputs are valid XML
+- optional live call create/cancel using a real Vobiz XML answer URL
+
+Required env vars:
+- `VOBIZ_AUTH_ID`
+- `VOBIZ_AUTH_TOKEN`
+
+Optional env vars (for live call test):
+- `TEST_FROM_NUMBER`
+- `TEST_TO_NUMBER`
+- `VOBIZ_XML_ANSWER_URL`
+- `VOBIZ_HANGUP_URL`
