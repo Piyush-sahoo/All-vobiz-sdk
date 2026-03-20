@@ -25,7 +25,7 @@ Full API details are in [README.md](README.md).
 npm install vobiz-node
 ```
 
-## 4) Configure authentication
+## 4) Configure authentication:
 
 ### Option A: Direct values
 
@@ -46,7 +46,7 @@ const { Client } = require('vobiz-node');
 const client = new Client();
 ```
 
-## 5) First script (copy/paste)
+## 5) First script (copy/paste):
 
 ```js
 const { Client } = require('vobiz-node');
