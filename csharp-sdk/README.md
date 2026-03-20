@@ -234,7 +234,11 @@ From `csharp-sdk` directory:
 dotnet test --configuration Release
 ```
 
-Includes XML tests in `src/Vobiz.Test/Xml`.
+Includes:
+- XML behavior tests in `src/Vobiz.Test/Xml`.
+- API contract tests in `src/Vobiz.Test/Api` (all scaffolded skip stubs replaced with active checks for DI resolution and operation method coverage).
+
+For local unit-test execution, `ApiTestsBase` reads `VOBIZ_AUTH_ID` and `VOBIZ_AUTH_TOKEN`; if unset, it uses safe placeholder values so tests still run without live credentials.
 
 ### Integration call-flow runner
 
@@ -267,5 +271,5 @@ Both are configured to avoid false failures due to missing live credentials by s
 ## Build Notes
 
 - SDK source is generated from OpenAPI and then extended manually (including XML support and tests).
-- API test stubs under `src/Vobiz.Test/Api` are scaffolded and many are intentionally marked `Skip = "not implemented"`.
-- XML feature tests are fully active and intended as a reliable functional test surface.
+- API test coverage under `src/Vobiz.Test/Api` is active (no `Skip = "not implemented"` stubs remaining).
+- XML feature tests under `src/Vobiz.Test/Xml` are active and validate XML builder behavior.
