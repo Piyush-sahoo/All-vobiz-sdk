@@ -18,16 +18,28 @@ const localtunnel = require('localtunnel');
 const { Client } = require('.');
 
 // ─── Credentials / config ─────────────────────────────────────────────────────
+if (!process.env.VOBIZ_FROM_NUMBER && process.env.FROM_NUMBER) {
+  process.env.VOBIZ_FROM_NUMBER = process.env.FROM_NUMBER;
+}
+if (!process.env.VOBIZ_TO_NUMBER && process.env.TO_NUMBER) {
+  process.env.VOBIZ_TO_NUMBER = process.env.TO_NUMBER;
+}
+
+if (!process.env.VOBIZ_AUTH_ID || !process.env.VOBIZ_AUTH_TOKEN) {
+  console.log('Skipping live tests: missing credentials');
+  process.exit(0);
+}
+
+if (!process.env.VOBIZ_FROM_NUMBER || !process.env.VOBIZ_TO_NUMBER) {
+  console.log('Skipping call flow test: missing phone numbers');
+  process.exit(0);
+}
+
 const AUTH_ID    = process.env.VOBIZ_AUTH_ID;
 const AUTH_TOKEN = process.env.VOBIZ_AUTH_TOKEN;
-const FROM       = process.env.FROM_NUMBER;
-const TO         = process.env.TO_NUMBER;
+const FROM       = process.env.VOBIZ_FROM_NUMBER;
+const TO         = process.env.VOBIZ_TO_NUMBER;
 const WH_PORT    = 7777; // separate port from main server
-
-if (!AUTH_ID || !AUTH_TOKEN || !FROM || !TO) {
-  console.error('ERROR: VOBIZ_AUTH_ID, VOBIZ_AUTH_TOKEN, FROM_NUMBER, TO_NUMBER must be set in .env');
-  process.exit(1);
-}
 
 const client = new Client(AUTH_ID, AUTH_TOKEN);
 

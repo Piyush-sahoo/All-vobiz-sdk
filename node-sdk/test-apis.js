@@ -3,6 +3,11 @@
 require('dotenv').config();
 const { Client } = require('.');
 
+if (!process.env.VOBIZ_AUTH_ID || !process.env.VOBIZ_AUTH_TOKEN) {
+  console.log('Skipping live tests: missing credentials');
+  process.exit(0);
+}
+
 const client = new Client(
   process.env.VOBIZ_AUTH_ID,
   process.env.VOBIZ_AUTH_TOKEN
