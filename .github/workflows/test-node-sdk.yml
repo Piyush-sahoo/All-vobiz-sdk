@@ -1,0 +1,44 @@
+name: Test Node SDK
+
+on:
+  push:
+    paths:
+      - 'node-sdk/**'
+      - '.github/workflows/test-node-sdk.yml'
+  pull_request:
+    paths:
+      - 'node-sdk/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: node-sdk
+    env:
+      VOBIZ_AUTH_ID: ${{ secrets.VOBIZ_AUTH_ID }}
+      VOBIZ_AUTH_TOKEN: ${{ secrets.VOBIZ_AUTH_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: node-sdk/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify SDK loads
+        run: node -e "const sdk = require('./index.js'); if (!sdk || !sdk.Client) { throw new Error('SDK Client export missing'); } console.log('Node SDK loaded successfully');"
+
+      - name: Run XML builder regression tests
+        run: node test-all-xml.js
+
+      - name: Run live API smoke tests (when secrets are available)
+        if: env.VOBIZ_AUTH_ID != '' && env.VOBIZ_AUTH_TOKEN != ''
+        run: node test-apis.js
