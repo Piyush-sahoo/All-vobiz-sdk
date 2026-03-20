@@ -63,9 +63,28 @@ jobs:
               throw new Error(`Missing XML builder: ${name}`);
             }
             const out = fn();
-            if (typeof out !== 'string' || !out.includes('<?xml') || !out.includes('<Response>')) {
+            if (typeof out !== 'string') {
               throw new Error(`Invalid XML output from ${name}`);
             }
+
+            if (name === 'ssml') {
+              if (!out.includes('<prosody')) {
+                throw new Error(`Invalid XML fragment output from ${name}`);
+              }
+              continue;
+            }
+
+            if (!out.includes('<?xml') || !out.includes('<Response>')) {
+              throw new Error(`Invalid XML output from ${name}`);
+            }
+          }
+
+          const ssmlSpeak = xml.speak({
+            useSSML: true,
+            ssmlContent: xml.ssml({ text: 'Hello from SSML' })
+          });
+          if (!ssmlSpeak.includes('<?xml') || !ssmlSpeak.includes('<Response>') || !ssmlSpeak.includes('<prosody')) {
+            throw new Error('Invalid combined SSML + Speak XML output');
           }
 
           console.log('XML builder smoke tests passed');
