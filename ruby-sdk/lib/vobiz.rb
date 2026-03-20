@@ -16,6 +16,9 @@ require 'vobiz/api_error'
 require 'vobiz/api_model_base'
 require 'vobiz/version'
 require 'vobiz/configuration'
+require 'vobiz/access_token'
+require 'vobiz/sdk/client'
+require 'vobiz/xml'
 
 # Models
 
@@ -32,6 +35,8 @@ require 'vobiz/api/sub_account_api'
 require 'vobiz/api/trunk_api'
 
 module Vobiz
+  Client = SDK::Client
+
   class << self
     # Customize default settings for the SDK using block.
     #   Vobiz.configure do |config|
