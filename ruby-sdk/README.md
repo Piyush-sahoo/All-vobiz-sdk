@@ -42,6 +42,29 @@ client.calls.speak_text(call['callUuid'], 'Hello from Vobiz Ruby SDK')
 client.calls.hangup(call['callUuid'])
 ```
 
+### Internal endpoint-call scripts (real Vobiz API)
+
+API reachability test (makes real requests to Vobiz):
+
+```bash
+cd ruby-sdk
+ruby test-apis.rb
+```
+
+Live call flow test (creates and controls a real call):
+
+```bash
+cd ruby-sdk
+ruby test-calls.rb
+```
+
+Required env vars for live call flow:
+- `VOBIZ_AUTH_ID`
+- `VOBIZ_AUTH_TOKEN`
+- `FROM_NUMBER`
+- `TO_NUMBER`
+- `VOBIZ_XML_ANSWER_URL`
+
 Complete Vobiz API collection covering all endpoints: Calls, Conferences, Recordings, Account, Phone Numbers, Applications, Endpoints, Trunks, Sub-Accounts, and CDR.
 
 Base URL: https://api.vobiz.ai
