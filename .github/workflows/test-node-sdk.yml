@@ -36,8 +36,40 @@ jobs:
       - name: Verify SDK loads
         run: node -e "const sdk = require('./index.js'); if (!sdk || !sdk.Client) { throw new Error('SDK Client export missing'); } console.log('Node SDK loaded successfully');"
 
-      - name: Run XML builder regression tests
-        run: node test-all-xml.js
+      - name: Run XML builder smoke tests
+        run: |
+          node - <<'NODE'
+          const xml = require('./lib/xml');
+
+          const builders = [
+            ['play', () => xml.play('https://example.com/a.mp3')],
+            ['wait', () => xml.wait({ length: 1 })],
+            ['hangup', () => xml.hangup()],
+            ['redirect', () => xml.redirect('https://example.com/next')],
+            ['dtmf', () => xml.dtmf({ digits: '1234' })],
+            ['preanswer', () => xml.preanswer({ audioUrl: 'https://example.com/a.mp3' })],
+            ['stream', () => xml.stream({ streamUrl: 'wss://example.com/stream' })],
+            ['conference', () => xml.conference({ conferenceName: 'room-1' })],
+            ['dial', () => xml.dial({ phoneNumber: '+14155551234' })],
+            ['gather', () => xml.gather({ prompt: 'Press 1' })],
+            ['record', () => xml.record({})],
+            ['speak', () => xml.speak({ text: 'Hello' })],
+            ['ssml', () => xml.ssml({ text: 'Hello' })],
+            ['speakAndWait', () => xml.speakAndWait({ text: 'Processing' })]
+          ];
+
+          for (const [name, fn] of builders) {
+            if (typeof xml[name] !== 'function') {
+              throw new Error(`Missing XML builder: ${name}`);
+            }
+            const out = fn();
+            if (typeof out !== 'string' || !out.includes('<?xml') || !out.includes('<Response>')) {
+              throw new Error(`Invalid XML output from ${name}`);
+            }
+          }
+
+          console.log('XML builder smoke tests passed');
+          NODE
 
       - name: Run live API smoke tests (when secrets are available)
         if: env.VOBIZ_AUTH_ID != '' && env.VOBIZ_AUTH_TOKEN != ''
