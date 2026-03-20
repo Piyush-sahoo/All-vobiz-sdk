@@ -13,64 +13,67 @@ module Vobiz
       attrs = [
         %(length="#{length}"),
         silence ? %(silence="#{silence}") : nil,
-        silence ? %(minSilence="#{min_silence}") : nil,
+        (silence && min_silence) ? %(minSilence="#{min_silence}") : nil,
         beep ? %(beep="#{beep}") : nil
       ].compact.join(' ')
-
       prompt_xml = prompt ? "\n  <Speak voice=\"WOMAN\" language=\"en-US\">#{esc(prompt)}</Speak>" : ''
       wrap("#{prompt_xml}\n  <Wait #{attrs}/>")
     end
 
-    def hangup(reason: nil, schedule: nil, prompt: nil)
+    def hangup(reason: nil, schedule: nil, prompt: 'Thank you for calling. Goodbye!')
       attrs = [
         reason ? %(reason="#{esc(reason)}") : nil,
         schedule ? %(schedule="#{esc(schedule)}") : nil
       ].compact.join(' ')
-      prompt_xml = prompt ? "\n  <Speak>#{esc(prompt)}</Speak>" : ''
       attrs = attrs.empty? ? '' : " #{attrs}"
-      wrap("#{prompt_xml}\n  <Hangup#{attrs}/>")
+      wrap("<Speak voice=\"WOMAN\" language=\"en-US\">#{esc(prompt)}</Speak>\n  <Hangup#{attrs}/>")
     end
 
     def redirect(url)
       wrap("<Redirect>#{esc(url)}</Redirect>")
     end
 
-    def dtmf(digits: '123', async: false)
-      async_attr = async ? %( async="#{async}") : ''
-      wrap("<DTMF digits=\"#{esc(digits)}\"#{async_attr}/>")
+    def dtmf(digits: '1234', async: true)
+      wrap("<Speak voice=\"WOMAN\" language=\"en-US\">Sending tones: #{esc(digits)}</Speak>\n  <DTMF async=\"#{async}\">#{esc(digits)}</DTMF>")
     end
 
-    def preanswer(audio_url: nil)
-      inner = audio_url ? "\n    <Play>#{esc(audio_url)}</Play>\n  " : ''
-      wrap("<PreAnswer>#{inner}</PreAnswer>")
+    def preanswer(audio_url: nil, prompt: 'Please hold while we process your call.')
+      audio_content = if audio_url
+                        "<Play>#{esc(audio_url)}</Play>"
+                      else
+                        "<Speak voice=\"WOMAN\" language=\"en-US\">#{esc(prompt)}</Speak>"
+                      end
+      wrap("<PreAnswer/>\n  #{audio_content}")
     end
 
-    def stream(stream_url:, bidirectional: true, stream_timeout: 600, status_callback_url: nil)
+    def stream(stream_url: 'wss://stream.example.com/audio', bidirectional: true, stream_timeout: 600,
+               status_callback_url: nil)
       attrs = [
-        %(url="#{esc(stream_url)}"),
         %(bidirectional="#{bidirectional}"),
         %(streamTimeout="#{stream_timeout}"),
         status_callback_url ? %(statusCallbackUrl="#{esc(status_callback_url)}") : nil
       ].compact.join(' ')
-      wrap("<Stream #{attrs}/>")
+      wrap("<Stream #{attrs}>#{esc(stream_url)}</Stream>")
     end
 
-    def conference(conference_name: 'conference-1', action_url: nil)
-      action_attr = action_url ? %( action="#{esc(action_url)}") : ''
-      wrap("<Conference#{action_attr}>#{esc(conference_name)}</Conference>")
+    def conference(conference_name: 'default-conference', action_url: nil, method: 'POST',
+                   prompt: 'Connecting you to the conference room.')
+      action_attr = action_url ? %( action="#{esc(action_url)}" method="#{method}") : ''
+      wrap("<Speak voice=\"WOMAN\" language=\"en-US\">#{esc(prompt)}</Speak>\n  <Conference#{action_attr}>#{esc(conference_name)}</Conference>")
     end
 
     def dial(phone_number: '+14155551234', action_url: nil, method: 'POST', hangup_on_star: false,
              time_limit: 14_400, timeout: nil, caller_id: nil, caller_name: nil,
              confirm_sound: nil, confirm_key: nil, dial_music: 'real', callback_url: nil,
-             callback_method: 'POST', redirect: true, send_digits: nil)
+             callback_method: 'POST', redirect: true, send_digits: nil,
+             prompt: nil, prompt_voice: 'WOMAN', prompt_language: 'en-US')
       attrs = [
         action_url ? %(action="#{esc(action_url)}") : nil,
         action_url ? %(method="#{method}") : nil,
         action_url ? %(redirect="#{redirect}") : nil,
         hangup_on_star ? %(hangupOnStar="#{hangup_on_star}") : nil,
-        time_limit ? %(timeLimit="#{time_limit}") : nil,
-        timeout ? %(timeout="#{timeout}") : nil,
+        truthy_js?(time_limit) ? %(timeLimit="#{time_limit}") : nil,
+        truthy_js?(timeout) ? %(timeout="#{timeout}") : nil,
         caller_id ? %(callerId="#{esc(caller_id)}") : nil,
         caller_name ? %(callerName="#{esc(caller_name)}") : nil,
         confirm_sound ? %(confirmSound="#{esc(confirm_sound)}") : nil,
@@ -81,7 +84,12 @@ module Vobiz
       ].compact.join(' ')
 
       number_attr = send_digits ? %( sendDigits="#{esc(send_digits)}") : ''
-      wrap("<Dial #{attrs}>\n    <Number#{number_attr}>#{esc(phone_number)}</Number>\n  </Dial>")
+      prompt_xml = if prompt
+                     "<Speak voice=\"#{esc(prompt_voice)}\" language=\"#{esc(prompt_language)}\">#{esc(prompt)}</Speak>\n  "
+                   else
+                     ''
+                   end
+      wrap("#{prompt_xml}<Dial #{attrs}>\n    <Number#{number_attr}>#{esc(phone_number)}</Number>\n  </Dial>")
     end
 
     def gather(action_url: nil, method: 'POST', input_type: 'dtmf', execution_timeout: 15,
@@ -92,14 +100,14 @@ module Vobiz
       attrs = [
         action_url ? %(action="#{esc(action_url)}") : nil,
         action_url ? %(method="#{method}") : nil,
-        %(inputType="#{input_type}"),
-        %(executionTimeout="#{execution_timeout}"),
-        %(digitEndTimeout="#{digit_end_timeout}"),
-        %(speechEndTimeout="#{speech_end_timeout}"),
-        %(finishOnKey="#{esc(finish_on_key)}"),
-        %(numDigits="#{num_digits}"),
-        %(speechModel="#{speech_model}"),
-        %(language="#{language}"),
+        truthy_js?(input_type) ? %(inputType="#{input_type}") : nil,
+        truthy_js?(execution_timeout) ? %(executionTimeout="#{execution_timeout}") : nil,
+        truthy_js?(digit_end_timeout) ? %(digitEndTimeout="#{digit_end_timeout}") : nil,
+        truthy_js?(speech_end_timeout) ? %(speechEndTimeout="#{speech_end_timeout}") : nil,
+        !finish_on_key.nil? ? %(finishOnKey="#{esc(finish_on_key)}") : nil,
+        truthy_js?(num_digits) ? %(numDigits="#{num_digits}") : nil,
+        truthy_js?(speech_model) ? %(speechModel="#{speech_model}") : nil,
+        truthy_js?(language) ? %(language="#{language}") : nil,
         %(log="#{log}"),
         %(redirect="#{redirect}"),
         %(profanityFilter="#{profanity_filter}"),
@@ -118,14 +126,14 @@ module Vobiz
         action_url ? %(action="#{esc(action_url)}") : nil,
         action_url ? %(method="#{method}") : nil,
         action_url ? %(redirect="#{redirect}") : nil,
-        %(fileFormat="#{file_format}"),
-        %(timeout="#{timeout}"),
-        %(maxLength="#{max_length}"),
+        truthy_js?(file_format) ? %(fileFormat="#{file_format}") : nil,
+        truthy_js?(timeout) ? %(timeout="#{timeout}") : nil,
+        truthy_js?(max_length) ? %(maxLength="#{max_length}") : nil,
         %(playBeep="#{play_beep}"),
-        %(finishOnKey="#{esc(finish_on_key)}"),
+        truthy_js?(finish_on_key) ? %(finishOnKey="#{esc(finish_on_key)}") : nil,
         %(recordSession="#{record_session}"),
         %(startOnDialAnswer="#{start_on_dial_answer}"),
-        %(transcriptionType="#{transcription_type}"),
+        truthy_js?(transcription_type) ? %(transcriptionType="#{transcription_type}") : nil,
         transcription_url ? %(transcriptionUrl="#{esc(transcription_url)}") : nil,
         transcription_url ? %(transcriptionMethod="#{transcription_method}") : nil,
         callback_url ? %(callbackUrl="#{esc(callback_url)}") : nil,
@@ -137,18 +145,31 @@ module Vobiz
 
     def speak(text: 'Hello', voice: 'WOMAN', language: 'en-US', loop: 1, use_ssml: false, ssml_content: nil)
       content = use_ssml && ssml_content ? ssml_content : esc(text)
-      loop_attr = loop.nil? ? '' : %( loop="#{loop}")
+      loop_attr = if !loop.nil? && loop.to_i > 0
+                    %( loop="#{loop}")
+                  elsif loop == 0
+                    ' loop="0"'
+                  else
+                    ''
+                  end
       wrap("<Speak voice=\"#{voice}\" language=\"#{language}\"#{loop_attr}>#{content}</Speak>")
     end
 
-    def ssml(text: 'Hello', rate: 'medium', breaks: 1, spell_out: false)
+    def ssml(text: 'Hello', rate: 'medium', breaks: 1, spell_out: false, voice: 'Polly.Amy')
       break_tags = Array.new(breaks, '<break/>').join
       content = spell_out ? %(<say-as interpret-as="spell-out">#{esc(text)}</say-as>) : esc(text)
+      _ = voice
       %(<prosody rate="#{esc(rate)}">#{content}#{break_tags}</prosody>)
     end
 
-    def speak_and_wait(text: 'Hello', wait_length: 1, voice: 'WOMAN', language: 'en-US')
-      wrap("<Speak voice=\"#{voice}\" language=\"#{language}\">#{esc(text)}</Speak>\n  <Wait length=\"#{wait_length}\"/>")
+    def speak_and_wait(text: 'Processing', voice: 'WOMAN', language: 'en-US', wait_length: 3,
+                       silence: false, min_silence: 2000)
+      wait_attrs = [
+        %(length="#{wait_length}"),
+        silence ? %(silence="#{silence}") : nil,
+        (silence && min_silence) ? %(minSilence="#{min_silence}") : nil
+      ].compact.join(' ')
+      wrap("<Speak voice=\"#{voice}\" language=\"#{language}\">#{esc(text)}</Speak>\n  <Wait #{wait_attrs}/>")
     end
 
     def wrap(inner)
@@ -157,6 +178,10 @@ module Vobiz
 
     def esc(value)
       CGI.escapeHTML(value.to_s)
+    end
+
+    def truthy_js?(value)
+      !value.nil? && value != false && value != '' && value != 0
     end
   end
 end
