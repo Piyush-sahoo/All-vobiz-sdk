@@ -20,6 +20,6 @@ test-all-xml.js
 test-xml2.js
 test-xml3.js
 test-xml3-http.js
-test-calls.js
+# test-calls.js
 public/
 server.js
