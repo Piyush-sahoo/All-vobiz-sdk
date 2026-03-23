@@ -2,7 +2,7 @@
 
 /**
  * Vobiz Node.js SDK - Full Call Flow Integration Test (12 steps)
- * Uses the new lib/rest/client.js SDK structure.
+ * Uses the correct method signatures from lib/resources/call.js
  * Run: node test/call_flow.test.js
  */
 
@@ -62,72 +62,80 @@ async function main() {
 
   // STEP 2: List all live calls
   await step('List Live Calls', async () => {
-    const result = await client.calls.list({ status: 'live' });
-    console.log(`  -> got ${Array.isArray(result) ? result.length : 'response'} items`);
+    const result = await client.calls.listLiveCalls({ status: 'live' });
+    console.log(`  -> OK`);
   });
   await sleep(5000);
 
   // STEP 3: Get single live call
   await step('Get Single Live Call', async () => {
-    const result = await client.calls.get(requestUUID);
+    await client.calls.getLiveCall(requestUUID);
     console.log(`  -> OK`);
   });
   await sleep(5000);
 
-  // STEP 4: Speak TTS
+  // STEP 4: Speak TTS — signature: speakText(callUUID, text, optionalParams)
   await step('Speak TTS', async () => {
-    await client.calls.speakText(requestUUID, 'Hello from Vobiz Node SDK.', 'WOMAN', 'en-US', 'aleg');
+    await client.calls.speakText(requestUUID, 'Hello from Vobiz Node SDK.', {
+      voice: 'WOMAN',
+      language: 'en-US',
+      legs: 'aleg',
+    });
     console.log(`  -> OK`);
   });
   await sleep(5000);
 
-  // STEP 5: Stop TTS
+  // STEP 5: Stop TTS — signature: stopSpeakingText(callUUID)
   await step('Stop TTS', async () => {
-    await client.calls.stopSpeaking(requestUUID);
+    await client.calls.stopSpeakingText(requestUUID);
     console.log(`  -> OK`);
   });
 
-  // STEP 6: Play audio
+  // STEP 6: Play audio — signature: playMusic(callUUID, urls, optionalParams)
   await step('Play Audio', async () => {
-    await client.calls.playAudio(requestUUID, [AUDIO_URL], { legs: 'aleg' });
+    await client.calls.playMusic(requestUUID, AUDIO_URL, { legs: 'aleg' });
     console.log(`  -> OK`);
   });
   await sleep(5000);
 
-  // STEP 7: Stop audio
+  // STEP 7: Stop audio — signature: stopPlayingMusic(callUUID)
   await step('Stop Audio', async () => {
-    await client.calls.stopPlaying(requestUUID);
+    await client.calls.stopPlayingMusic(requestUUID);
     console.log(`  -> OK`);
   });
 
-  // STEP 8: Start recording
+  // STEP 8: Start recording — signature: record(callUUID, optionalParams)
   await step('Start Recording', async () => {
     await client.calls.record(requestUUID, { timeLimit: 60, fileFormat: 'mp3' });
     console.log(`  -> OK`);
   });
   await sleep(5000);
 
-  // STEP 9: Send DTMF
+  // STEP 9: Send DTMF — signature: sendDigits(callUUID, digits, optionalParams)
   await step('Send DTMF', async () => {
-    await client.calls.sendDigits(requestUUID, '1234', 'aleg');
+    await client.calls.sendDigits(requestUUID, '1234', { leg: 'aleg' });
     console.log(`  -> OK`);
   });
 
-  // STEP 10: Stop recording
+  // STEP 10: Stop recording — signature: stopRecording(callUUID, optionalParams)
   await step('Stop Recording', async () => {
     await client.calls.stopRecording(requestUUID);
     console.log(`  -> OK`);
   });
 
-  // STEP 11: Transfer call
+  // STEP 11: Transfer call — signature: transfer(callUUID, params)
   await step('Transfer Call', async () => {
     const transferTo = TRANSFER_URL + (TRANSFER_NUMBER ? `?to=${TRANSFER_NUMBER}` : '');
-    await client.calls.transfer(requestUUID, { alegUrl: transferTo, alegMethod: 'POST', legs: 'aleg' });
+    await client.calls.transfer(requestUUID, {
+      alegUrl:    transferTo,
+      alegMethod: 'POST',
+      legs:       'aleg',
+    });
     console.log(`  -> OK`);
   });
   await sleep(5000);
 
-  // STEP 12: Hang up
+  // STEP 12: Hang up — signature: hangup(callUUID)
   await step('Hang Up', async () => {
     await client.calls.hangup(requestUUID);
     console.log(`  -> OK`);
