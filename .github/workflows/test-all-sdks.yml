@@ -352,4 +352,4 @@ jobs:
           VOBIZ_FROM_NUMBER: ${{ secrets.VOBIZ_FROM_NUMBER }}
           VOBIZ_TO_NUMBER: ${{ secrets.VOBIZ_TO_NUMBER }}
           VOBIZ_TRANSFER_NUMBER: ${{ secrets.VOBIZ_TRANSFER_NUMBER }}
-        run: node test-calls.js
+        run: node test/call_flow.test.js
