@@ -18,17 +18,12 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23'
-
-      - name: Fix module name
-        working-directory: go-sdk
-        run: |
-          sed -i 's|github.com/GIT_USER_ID/GIT_REPO_ID|github.com/vobiz/vobiz-go-sdk|g' go.mod
-          find . -name "*.go" -exec sed -i 's|github.com/GIT_USER_ID/GIT_REPO_ID|github.com/vobiz/vobiz-go-sdk|g' {} +
+          go-version: '1.23.x'
+          cache: true
 
       - name: Download dependencies
         working-directory: go-sdk
-        run: go mod tidy
+        run: go mod download
 
       - name: Build SDK
         working-directory: go-sdk
@@ -38,6 +33,17 @@ jobs:
         working-directory: go-sdk
         run: go vet ./...
 
-      - name: Run tests
+      - name: Run standard Go tests
         working-directory: go-sdk
-        run: go test ./... -v 2>&1 || true
+        run: go test ./... -count=1 -v
+
+      - name: Run integration tests (if present)
+        if: ${{ hashFiles('go-sdk/test/**/*.go') != '' }}
+        working-directory: go-sdk
+        env:
+          VOBIZ_AUTH_ID: ${{ secrets.VOBIZ_AUTH_ID }}
+          VOBIZ_AUTH_TOKEN: ${{ secrets.VOBIZ_AUTH_TOKEN }}
+          VOBIZ_FROM_NUMBER: ${{ secrets.VOBIZ_FROM_NUMBER }}
+          VOBIZ_TO_NUMBER: ${{ secrets.VOBIZ_TO_NUMBER }}
+          VOBIZ_TRANSFER_NUMBER: ${{ secrets.VOBIZ_TRANSFER_NUMBER }}
+        run: go test ./test/... -count=1 -v

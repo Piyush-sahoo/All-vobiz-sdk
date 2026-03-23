@@ -2,6 +2,69 @@
 
 Vobiz - the Ruby gem for the Vobiz API
 
+## Node-style Ruby SDK (recommended)
+
+This repository now includes a Node-SDK-compatible Ruby surface:
+
+- `Vobiz::Client` (alias of `Vobiz::SDK::Client`)
+- resource accessors: `calls`, `recordings`, `conferences`, `cdr`, `numbers`, `endpoints`, `applications`, `messages`, `trunks`, `credentials`, `ip_acl`, `origination_uris`, `account`, `subaccounts`, `balance`
+- XML helpers in `Vobiz::XML`
+- JWT helper `Vobiz::AccessToken`
+
+### Quick example
+
+```ruby
+require 'vobiz'
+
+client = Vobiz::Client.new(ENV['VOBIZ_AUTH_ID'], ENV['VOBIZ_AUTH_TOKEN'])
+
+profile = client.account.get_profile
+puts profile
+
+xml = Vobiz::XML.gather(
+  action_url: 'https://example.com/menu-choice',
+  prompt: 'Press 1 for sales, 2 for support'
+)
+puts xml
+```
+
+### Call control example
+
+```ruby
+call = client.calls.create(
+  '+911171366914',
+  '+919148227303',
+  'https://example.com/answer',
+  hangup_url: 'https://example.com/hangup'
+)
+
+client.calls.speak_text(call['callUuid'], 'Hello from Vobiz Ruby SDK')
+client.calls.hangup(call['callUuid'])
+```
+
+### Internal endpoint-call scripts (real Vobiz API)
+
+API reachability test (makes real requests to Vobiz):
+
+```bash
+cd ruby-sdk
+ruby test-apis.rb
+```
+
+Live call flow test (creates and controls a real call):
+
+```bash
+cd ruby-sdk
+ruby test-calls.rb
+```
+
+Required env vars for live call flow:
+- `VOBIZ_AUTH_ID`
+- `VOBIZ_AUTH_TOKEN`
+- `FROM_NUMBER`
+- `TO_NUMBER`
+- `VOBIZ_XML_ANSWER_URL`
+
 Complete Vobiz API collection covering all endpoints: Calls, Conferences, Recordings, Account, Phone Numbers, Applications, Endpoints, Trunks, Sub-Accounts, and CDR.
 
 Base URL: https://api.vobiz.ai

@@ -15,25 +15,26 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.23'
-      - name: Fix module name
-        working-directory: go-sdk
-        run: |
-          sed -i 's|github.com/GIT_USER_ID/GIT_REPO_ID|github.com/vobiz/vobiz-go-sdk|g' go.mod
-          find . -name "*.go" -exec sed -i 's|github.com/GIT_USER_ID/GIT_REPO_ID|github.com/vobiz/vobiz-go-sdk|g' {} +
-      - run: go mod tidy
+          go-version: '1.23.x'
+          cache: true
+      - run: go mod download
         working-directory: go-sdk
       - run: go build ./...
         working-directory: go-sdk
       - run: go vet ./...
         working-directory: go-sdk
+      - name: Run standard Go tests
+        working-directory: go-sdk
+        run: go test ./... -count=1 -v
       - name: Run integration tests
+        if: ${{ hashFiles('go-sdk/test/**/*.go') != '' }}
         working-directory: go-sdk
         env:
           VOBIZ_AUTH_ID: ${{ secrets.VOBIZ_AUTH_ID }}
           VOBIZ_AUTH_TOKEN: ${{ secrets.VOBIZ_AUTH_TOKEN }}
         run: go test ./test/... -v -run Test_Integration
       - name: Run call flow test
+        if: ${{ hashFiles('go-sdk/test/**/*.go') != '' }}
         working-directory: go-sdk
         env:
           VOBIZ_AUTH_ID: ${{ secrets.VOBIZ_AUTH_ID }}
@@ -337,15 +338,12 @@ jobs:
       - name: Install dependencies
         working-directory: node-sdk
         run: npm install
-      - name: Build TypeScript
-        working-directory: node-sdk
-        run: npm run build
       - name: Run integration tests
         working-directory: node-sdk
         env:
           VOBIZ_AUTH_ID: ${{ secrets.VOBIZ_AUTH_ID }}
           VOBIZ_AUTH_TOKEN: ${{ secrets.VOBIZ_AUTH_TOKEN }}
-        run: npm run integration
+        run: node test-apis.js
       - name: Run call flow test
         working-directory: node-sdk
         env:
@@ -354,4 +352,4 @@ jobs:
           VOBIZ_FROM_NUMBER: ${{ secrets.VOBIZ_FROM_NUMBER }}
           VOBIZ_TO_NUMBER: ${{ secrets.VOBIZ_TO_NUMBER }}
           VOBIZ_TRANSFER_NUMBER: ${{ secrets.VOBIZ_TRANSFER_NUMBER }}
-        run: npx ts-node test/call_flow.test.ts
+        run: node test-calls.js

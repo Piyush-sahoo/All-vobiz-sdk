@@ -1,0 +1,95 @@
+name: Test Node SDK
+
+on:
+  push:
+    paths:
+      - 'node-sdk/**'
+      - '.github/workflows/test-node-sdk.yml'
+  pull_request:
+    paths:
+      - 'node-sdk/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: node-sdk
+    env:
+      VOBIZ_AUTH_ID: ${{ secrets.VOBIZ_AUTH_ID }}
+      VOBIZ_AUTH_TOKEN: ${{ secrets.VOBIZ_AUTH_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: node-sdk/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify SDK loads
+        run: node -e "const sdk = require('./index.js'); if (!sdk || !sdk.Client) { throw new Error('SDK Client export missing'); } console.log('Node SDK loaded successfully');"
+
+      - name: Run XML builder smoke tests
+        run: |
+          node - <<'NODE'
+          const xml = require('./lib/xml');
+
+          const builders = [
+            ['play', () => xml.play('https://example.com/a.mp3')],
+            ['wait', () => xml.wait({ length: 1 })],
+            ['hangup', () => xml.hangup()],
+            ['redirect', () => xml.redirect('https://example.com/next')],
+            ['dtmf', () => xml.dtmf({ digits: '1234' })],
+            ['preanswer', () => xml.preanswer({ audioUrl: 'https://example.com/a.mp3' })],
+            ['stream', () => xml.stream({ streamUrl: 'wss://example.com/stream' })],
+            ['conference', () => xml.conference({ conferenceName: 'room-1' })],
+            ['dial', () => xml.dial({ phoneNumber: '+14155551234' })],
+            ['gather', () => xml.gather({ prompt: 'Press 1' })],
+            ['record', () => xml.record({})],
+            ['speak', () => xml.speak({ text: 'Hello' })],
+            ['ssml', () => xml.ssml({ text: 'Hello' })],
+            ['speakAndWait', () => xml.speakAndWait({ text: 'Processing' })]
+          ];
+
+          for (const [name, fn] of builders) {
+            if (typeof xml[name] !== 'function') {
+              throw new Error(`Missing XML builder: ${name}`);
+            }
+            const out = fn();
+            if (typeof out !== 'string') {
+              throw new Error(`Invalid XML output from ${name}`);
+            }
+
+            if (name === 'ssml') {
+              if (!out.includes('<prosody')) {
+                throw new Error(`Invalid XML fragment output from ${name}`);
+              }
+              continue;
+            }
+
+            if (!out.includes('<?xml') || !out.includes('<Response>')) {
+              throw new Error(`Invalid XML output from ${name}`);
+            }
+          }
+
+          const ssmlSpeak = xml.speak({
+            useSSML: true,
+            ssmlContent: xml.ssml({ text: 'Hello from SSML' })
+          });
+          if (!ssmlSpeak.includes('<?xml') || !ssmlSpeak.includes('<Response>') || !ssmlSpeak.includes('<prosody')) {
+            throw new Error('Invalid combined SSML + Speak XML output');
+          }
+
+          console.log('XML builder smoke tests passed');
+          NODE
+
+      - name: Run live API smoke tests (when secrets are available)
+        if: env.VOBIZ_AUTH_ID != '' && env.VOBIZ_AUTH_TOKEN != ''
+        run: node test-apis.js
